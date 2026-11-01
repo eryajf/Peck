@@ -277,7 +277,7 @@ jobs:
           : "${CNB_USERNAME:?Missing CNB_USERNAME secret}"
           : "${CNB_TOKEN:?Missing CNB_TOKEN secret}"
           curl -fsSL https://cnb.cool/znb/mpgrm/-/releases/download/v0.1.0/mpgrm_linux_amd64.tar.gz -o "$RUNNER_TEMP/mpgrm.tar.gz"
-          tar -xf "$RUNNER_TEMP/mpgrm.tar.gz" -C "$RUNNER_TEMP" mpgrm
+          tar -xf "$RUNNER_TEMP/mpgrm.tar.gz" -C "$RUNNER_TEMP"
           chmod +x "$RUNNER_TEMP/mpgrm"
           "$RUNNER_TEMP/mpgrm" releases sync \
             --repo "https://github.com/${GITHUB_REPOSITORY}.git" \
