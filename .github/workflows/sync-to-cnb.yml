@@ -44,7 +44,11 @@ jobs:
             git push https://cnb.cool/znb/Peck.git --tags
           elif [[ "$GITHUB_REF" == refs/tags/* ]]; then
             source="$GITHUB_REF"
-            git push https://cnb.cool/znb/Peck.git "${source}:${GITHUB_REF}"
+            if [[ "$GITHUB_REF" == refs/tags/v0.1.0 ]]; then
+              git push https://cnb.cool/znb/Peck.git --force-with-lease="${GITHUB_REF}:4f4586ae922ae8a03d66a3f6c2e8b409c08d90c9" "${source}:${GITHUB_REF}"
+            else
+              git push https://cnb.cool/znb/Peck.git "${source}:${GITHUB_REF}"
+            fi
           else
             git push https://cnb.cool/znb/Peck.git "HEAD:${GITHUB_REF}"
           fi

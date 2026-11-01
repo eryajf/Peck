@@ -260,7 +260,11 @@ jobs:
           printf '%s\n' '#!/bin/sh' 'case "$1" in *Username*) printf "%s\n" "$CNB_USERNAME" ;; *) printf "%s\n" "$CNB_TOKEN" ;; esac' > "$askpass"
           chmod 700 "$askpass"
           export GIT_ASKPASS="$askpass" GIT_TERMINAL_PROMPT=0
-          git push https://cnb.cool/znb/Peck.git "refs/tags/${RELEASE_TAG}:refs/tags/${RELEASE_TAG}"
+          if [[ "$RELEASE_TAG" == v0.1.0 ]]; then
+            git push https://cnb.cool/znb/Peck.git --force-with-lease="refs/tags/${RELEASE_TAG}:4f4586ae922ae8a03d66a3f6c2e8b409c08d90c9" "refs/tags/${RELEASE_TAG}:refs/tags/${RELEASE_TAG}"
+          else
+            git push https://cnb.cool/znb/Peck.git "refs/tags/${RELEASE_TAG}:refs/tags/${RELEASE_TAG}"
+          fi
       - name: Sync release and assets
         env:
           CNB_USERNAME: ${{ secrets.CNB_USERNAME }}
