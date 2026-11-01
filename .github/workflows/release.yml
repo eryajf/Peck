@@ -1,0 +1,168 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+# The app depends on a small set of Viva changes that are kept in the author's
+# Viva fork. Keep this commit aligned with the local tmp/viva checkout before
+# creating a new Peck tag. The checkout is deliberately outside the public
+# Peck tree and is ignored by .gitignore.
+env:
+  VIVA_REPOSITORY: ${{ vars.VIVA_REPOSITORY || 'eryajf/viva' }}
+  VIVA_REF: ${{ vars.VIVA_REF || '8b48f3af440de90a1259a917c948f165c83568e5' }}
+
+jobs:
+  build:
+    name: macOS ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: arm64
+            runner: macos-14
+          - arch: amd64
+            runner: macos-15-intel
+    steps:
+      - name: Check out Peck
+        uses: actions/checkout@v7
+
+      - name: Check out the pinned Viva source
+        uses: actions/checkout@v7
+        with:
+          repository: ${{ env.VIVA_REPOSITORY }}
+          ref: ${{ env.VIVA_REF }}
+          path: tmp/viva
+          token: ${{ secrets.VIVA_REPO_TOKEN || github.token }}
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
+
+      - name: Verify the tag matches viva.toml
+        shell: bash
+        run: |
+          set -euo pipefail
+          version=$(sed -n 's/^version *= *"\([^"]*\)".*/\1/p' viva.toml | head -1)
+          if [[ "v${version}" != "${GITHUB_REF_NAME}" ]]; then
+            echo "::error::tag ${GITHUB_REF_NAME} does not match viva.toml version ${version}"
+            exit 1
+          fi
+
+      - name: Check Apple signing secrets
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          missing=()
+          for name in APPLE_CERTIFICATE APPLE_CERTIFICATE_PASSWORD APPLE_API_KEY_P8 APPLE_API_KEY_ID APPLE_API_ISSUER; do
+            if [[ -z "${!name:-}" ]]; then
+              missing+=("$name")
+            fi
+          done
+          if (( ${#missing[@]} )); then
+            echo "::error::missing Apple release secrets: ${missing[*]}"
+            exit 1
+          fi
+
+      - name: Write the App Store Connect API key
+        env:
+          APPLE_API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          key="$RUNNER_TEMP/AuthKey.p8"
+          printf '%s\n' "$APPLE_API_KEY_P8" > "$key"
+          echo "APPLE_API_KEY=$key" >> "$GITHUB_ENV"
+
+      - name: Build macOS packages
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_NOTARY_PROFILE: ${{ secrets.APPLE_NOTARY_PROFILE }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$GITHUB_WORKSPACE/build/release/${{ matrix.arch }}/Peck.app"
+          mkdir -p "$(dirname "$out")"
+          args=(package --target darwin --arch "${{ matrix.arch }}" --format zip,dmg --out "$out")
+          args+=(--notarize)
+          go tool viva "${args[@]}"
+
+      - name: Verify the signed and notarized packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          app="$GITHUB_WORKSPACE/build/release/${{ matrix.arch }}/Peck.app"
+          codesign --verify --deep --strict --verbose=2 "$app"
+          for image in "$GITHUB_WORKSPACE"/build/release/${{ matrix.arch }}/*.dmg; do
+            xcrun stapler validate "$image"
+            spctl -a -vvv -t open --context context:primary-signature "$image"
+          done
+
+      - name: Upload architecture packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: peck-${{ matrix.arch }}
+          path: |
+            build/release/${{ matrix.arch }}/*.zip
+            build/release/${{ matrix.arch }}/*.dmg
+          if-no-files-found: error
+
+  release:
+    name: Publish GitHub release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download packages
+        uses: actions/download-artifact@v4
+        with:
+          pattern: peck-*
+          path: dist
+          merge-multiple: true
+
+      - name: Create checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          (
+            cd dist
+            sha256sum *.zip *.dmg > SHA256SUMS
+          )
+
+      - name: Create or update the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="$GITHUB_REF_NAME"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$tag" --repo "$GITHUB_REPOSITORY" dist/* --clobber
+            gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --title "Peck $tag" --draft=false --latest
+          else
+            gh release create "$tag" --repo "$GITHUB_REPOSITORY" dist/* \
+              --title "Peck $tag" --generate-notes --latest
+          fi

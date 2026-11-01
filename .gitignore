@@ -1,0 +1,37 @@
+# Build and packaging outputs
+/build/
+/dist/
+/tmp/
+
+# Go test, coverage, profiling, and log output
+*.test
+*.out
+*.prof
+*.log
+/coverage/
+
+# Local Go workspace files
+go.work
+go.work.sum
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# macOS metadata
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor and temporary files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Private brand source masters
+/internal/brand/assets/logo/
+/internal/brand/assets/macos/
+/internal/brand/assets/menubar/

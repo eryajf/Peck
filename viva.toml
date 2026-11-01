@@ -1,0 +1,12 @@
+[app]
+name = "Peck"
+id = "com.eryajf.peck"
+version = "0.1.0"
+executable = "peck"
+package = "."
+icon = "internal/brand/assets/runtime/app-icon.png"
+url_schemes = ["peck"]
+
+[mac]
+min_system = "14.0"
+category = "public.app-category.utilities"
