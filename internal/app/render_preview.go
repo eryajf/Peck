@@ -18,6 +18,7 @@ import (
 	"github.com/eryajf/Peck/internal/brand"
 	"github.com/eryajf/Peck/internal/core"
 	"github.com/eryajf/Peck/internal/i18n"
+	"github.com/eryajf/Peck/internal/update"
 	vapp "github.com/vivaui/viva/app"
 	"github.com/vivaui/viva/headless"
 	"github.com/vivaui/viva/ui"
@@ -34,7 +35,7 @@ func renderPreview(dir string) error {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return err
 	}
-	a := &application{prefs: preferences{Motion: false, Appearance: "paper"}, language: i18n.Chinese, messages: i18n.For(i18n.Chinese), visible: true, motionStarted: time.Now()}
+	a := &application{prefs: preferences{Motion: false, Appearance: "paper"}, language: i18n.Chinese, messages: i18n.For(i18n.Chinese), currentVersion: "0.1.0", visible: true, motionStarted: time.Now()}
 	write := func(name string, width, height int, paint func(*ui.Canvas, ui.Size)) error {
 		config := vapp.Config{Title: "Peck", Width: width, Height: height, WindowMode: vapp.WindowFrameless, ClearColor: transparentClearColor(), Paint: paint}
 		canvas := &ui.Canvas{}
@@ -94,9 +95,14 @@ func renderPreview(dir string) error {
 		return err
 	}
 	a.prefs.Appearance = "midnight"
-	return write("07-settings.png", settingsWidth, settingsHeight, func(canvas *ui.Canvas, size ui.Size) {
-		a.paintSettings(canvas, size)
-	})
+	a.currentVersion = "0.0.9"
+	a.prefs.AutoCheckUpdate = true
+	a.prefs.UpdateSource = update.SourceGitHub
+	a.updateResult = update.Result{CurrentVersion: "0.0.9", LatestVersion: "0.1.0", Comparison: update.ComparisonUpdateAvailable, Release: update.Release{Version: "0.1.0", Notes: "## 更新内容\n\n- 修复设置页布局。\n- 使用独立更新窗口，支持 **Markdown 更新说明**。\n- 支持下载进度与重启升级。"}}
+	if err := write("07-update-window.png", updateWindowWidth, updateWindowHeight, a.paintUpdateWindow); err != nil {
+		return err
+	}
+	return write("08-settings.png", settingsWidth, settingsHeight, a.paintSettings)
 }
 
 // rasterizePreview is a portable emergency renderer for development exports.

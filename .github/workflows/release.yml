@@ -166,6 +166,27 @@ jobs:
             sha256sum *.zip *.dmg > SHA256SUMS
           )
 
+      - name: Verify update assets and checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          zips=(dist/*.zip)
+          if (( ${#zips[@]} != 2 )); then
+            echo "::error::expected exactly two architecture ZIP assets, found ${#zips[@]}"
+            exit 1
+          fi
+          for zip in "${zips[@]}"; do
+            case "$(basename "$zip")" in
+              *-darwin-arm64.zip|*-darwin-amd64.zip) ;;
+              *) echo "::error::unexpected update ZIP name: $(basename "$zip")"; exit 1 ;;
+            esac
+          done
+          while read -r checksum name; do
+            [[ -n "$checksum" && -n "$name" ]] || continue
+            [[ -f "dist/$name" ]] || { echo "::error::SHA256SUMS references missing asset $name"; exit 1; }
+          done < dist/SHA256SUMS
+
       - name: Build release notes header
         id: release_header
         shell: bash

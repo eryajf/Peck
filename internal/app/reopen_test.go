@@ -96,12 +96,14 @@ func reopenTestApplication(t *testing.T) (*application, *reopenTestHost) {
 
 type reopenTestHost struct {
 	windows []*reopenTestWindow
+	configs []vapp.Config
 	front   string
 }
 
 func (host *reopenTestHost) OpenWindow(config vapp.Config, _ *ui.Canvas, closed func()) (vapp.WindowControl, error) {
 	window := &reopenTestWindow{host: host, title: config.Title, closed: closed}
 	host.windows = append(host.windows, window)
+	host.configs = append(host.configs, config)
 	window.Show()
 	return window, nil
 }
