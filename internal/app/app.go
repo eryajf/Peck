@@ -17,6 +17,8 @@ import (
 	"github.com/eryajf/Peck/internal/brand"
 	"github.com/eryajf/Peck/internal/core"
 	"github.com/eryajf/Peck/internal/i18n"
+	"github.com/eryajf/Peck/internal/update"
+	"github.com/eryajf/Peck/internal/version"
 	"github.com/eryajf/Peck/internal/vui"
 	vapp "github.com/vivaui/viva/app"
 	"github.com/vivaui/viva/app/singleinstance"
@@ -63,61 +65,76 @@ const (
 	wakeLaunch
 	wakeIcon
 	wakeLinkTarget
+	wakeUpdateCheck
+	wakeUpdateDownload
 )
 
 type wakeEvent struct {
-	kind       wakeKind
-	generation uint64
-	inspection *core.Inspection
-	icon       vui.ImageSource
-	result     core.Result
-	progress   core.Progress
-	paths      []string
-	err        error
-	openResult core.Result
-	openErr    error
-	launchArgs []string
-	linkPaths  []string
+	kind           wakeKind
+	generation     uint64
+	inspection     *core.Inspection
+	icon           vui.ImageSource
+	result         core.Result
+	progress       core.Progress
+	paths          []string
+	err            error
+	openResult     core.Result
+	openErr        error
+	launchArgs     []string
+	linkPaths      []string
+	update         update.Result
+	updateProgress update.Progress
+	updatePath     string
 }
 
 var (
-	tree                = ui.Tree{}
-	mainFeature         = tree.Feature("main")
-	settingsFeature     = tree.Feature("settings")
-	menuFeature         = tree.Feature("tray-menu")
-	idChoose            = tree.ID(mainFeature, "choose")
-	idSettings          = tree.ID(mainFeature, "settings")
-	idHide              = tree.ID(mainFeature, "hide")
-	idStop              = tree.ID(mainFeature, "stop")
-	idBusy              = tree.ID(mainFeature, "busy")
-	idConfirm           = tree.ID(mainFeature, "confirm")
-	idReplace           = tree.ID(mainFeature, "replace")
-	idDone              = tree.ID(mainFeature, "done")
-	idOpen              = tree.ID(mainFeature, "open")
-	idRecheck           = tree.ID(mainFeature, "recheck")
-	idTrust             = tree.ID(mainFeature, "trust")
-	idTheme             = tree.ID(settingsFeature, "theme")
-	idLanguage          = tree.ID(settingsFeature, "language")
-	idThemeScope        = tree.ID(settingsFeature, "theme-scope")
-	idThemeDismiss      = tree.ID(settingsFeature, "theme-dismiss")
-	idThemeScroll       = tree.ID(settingsFeature, "theme-scroll")
-	themeOptionScope    = tree.Sub(settingsFeature, tree.Name("theme-option"))
-	languageOptionScope = tree.Sub(settingsFeature, tree.Name("language-option"))
-	idMotion            = tree.ID(settingsFeature, "motion")
-	idRequire           = tree.ID(settingsFeature, "require-trust")
-	idBack              = tree.ID(settingsFeature, "back")
-	idQuit              = tree.ID(settingsFeature, "quit")
-	idMenuOpen          = tree.ID(menuFeature, "open")
-	idMenuChoose        = tree.ID(menuFeature, "choose")
-	idMenuSettings      = tree.ID(menuFeature, "settings")
-	idMenuQuit          = tree.ID(menuFeature, "quit")
+	tree                   = ui.Tree{}
+	mainFeature            = tree.Feature("main")
+	settingsFeature        = tree.Feature("settings")
+	menuFeature            = tree.Feature("tray-menu")
+	idChoose               = tree.ID(mainFeature, "choose")
+	idSettings             = tree.ID(mainFeature, "settings")
+	idHide                 = tree.ID(mainFeature, "hide")
+	idStop                 = tree.ID(mainFeature, "stop")
+	idBusy                 = tree.ID(mainFeature, "busy")
+	idConfirm              = tree.ID(mainFeature, "confirm")
+	idReplace              = tree.ID(mainFeature, "replace")
+	idDone                 = tree.ID(mainFeature, "done")
+	idOpen                 = tree.ID(mainFeature, "open")
+	idRecheck              = tree.ID(mainFeature, "recheck")
+	idTrust                = tree.ID(mainFeature, "trust")
+	idTheme                = tree.ID(settingsFeature, "theme")
+	idLanguage             = tree.ID(settingsFeature, "language")
+	idAutoUpdate           = tree.ID(settingsFeature, "auto-update")
+	idUpdateSource         = tree.ID(settingsFeature, "update-source")
+	idProject              = tree.ID(settingsFeature, "project")
+	idDonate               = tree.ID(settingsFeature, "donate")
+	idCheckUpdate          = tree.ID(settingsFeature, "check-update")
+	updateFeature          = tree.Feature("update")
+	updateNotesLinks       = tree.Sub(updateFeature, tree.Name("notes-links"))
+	idUpdatePromptLater    = tree.ID(updateFeature, "later")
+	idUpdatePromptDownload = tree.ID(updateFeature, "download")
+	idUpdatePromptRelease  = tree.ID(updateFeature, "release")
+	idThemeScope           = tree.ID(settingsFeature, "theme-scope")
+	idThemeDismiss         = tree.ID(settingsFeature, "theme-dismiss")
+	idThemeScroll          = tree.ID(settingsFeature, "theme-scroll")
+	themeOptionScope       = tree.Sub(settingsFeature, tree.Name("theme-option"))
+	languageOptionScope    = tree.Sub(settingsFeature, tree.Name("language-option"))
+	idMotion               = tree.ID(settingsFeature, "motion")
+	idRequire              = tree.ID(settingsFeature, "require-trust")
+	idBack                 = tree.ID(settingsFeature, "back")
+	idQuit                 = tree.ID(settingsFeature, "quit")
+	idMenuOpen             = tree.ID(menuFeature, "open")
+	idMenuChoose           = tree.ID(menuFeature, "choose")
+	idMenuSettings         = tree.ID(menuFeature, "settings")
+	idMenuQuit             = tree.ID(menuFeature, "quit")
 )
 
 type application struct {
 	host                                                     *vapp.Application
-	panel, settings, trayMenu                                *vapp.Window
+	panel, settings, trayMenu, updateWindow                  *vapp.Window
 	tray                                                     *vapp.StatusItem
-	mainInv, setInv                                          vapp.Invalidator
+	mainInv, setInv, updateInv                               vapp.Invalidator
 	state                                                    page
 	inspection                                               *core.Inspection
 	result                                                   core.Result
@@ -150,6 +167,24 @@ type application struct {
 	targetGeneration                     uint64
 	linkResolving                        bool
 	linkCancel                           context.CancelFunc
+	currentVersion                       string
+	updateChecking                       bool
+	updateResult                         update.Result
+	updateError                          string
+	updateCancel                         context.CancelFunc
+	updateDownloadCancel                 context.CancelFunc
+	updateStore                          *update.StateStore
+	updateDownloading                    bool
+	updateDownloadCancelRequested        bool
+	updateProgress                       update.Progress
+	updateReady                          update.ReadyState
+	updateReadyOK                        bool
+	updateNotes                          updateNotes
+	updatePromptDismissedVersion         string
+	updateCheckGeneration                uint64
+	updateCheckAutomatic                 bool
+	updateDownloadGeneration             uint64
+	updateStartupReady                   update.ReadyState
 }
 
 func (a *application) ensureMessages() {
@@ -159,7 +194,7 @@ func (a *application) ensureMessages() {
 	}
 }
 
-func Run(args []string) error {
+func Run(args []string, currentVersion ...string) error {
 	if runtime.GOOS != "darwin" {
 		return errors.New(i18n.For(i18n.Chinese).AppOnlyMacOS)
 	}
@@ -168,7 +203,16 @@ func Run(args []string) error {
 	}
 	prefs := readPreferences()
 	language, _ := languageFromPreferences(prefs, vapp.PreferredLanguages())
-	a := &application{prefs: prefs, language: language, messages: i18n.For(language), insectKind: rand.IntN(brand.InsectCount), motionStarted: time.Now()}
+	buildVersion := version.Current
+	if len(currentVersion) > 0 && strings.TrimSpace(currentVersion[0]) != "" {
+		buildVersion = version.Normalize(currentVersion[0])
+	}
+	storePath := ""
+	if dir, err := os.UserConfigDir(); err == nil {
+		storePath = filepath.Join(dir, "Peck", "update-state.json")
+	}
+	a := &application{prefs: prefs, language: language, messages: i18n.For(language), currentVersion: buildVersion, updateStore: update.NewStateStore(storePath), insectKind: rand.IntN(brand.InsectCount), motionStarted: time.Now()}
+	a.restoreUpdateState()
 	claim, primary, err := singleinstance.SingleInstance("com.eryajf.peck", args, func(launchArgs []string) {
 		a.publish(wakeEvent{kind: wakeLaunch, launchArgs: launchArgs})
 	})
@@ -185,6 +229,7 @@ func Run(args []string) error {
 		host.OnReopen(a.showMain)
 		host.OnOpenURL(a.receiveURL)
 		host.OnQuitRequest(func(allow func()) {
+			a.cancelUpdateWork()
 			if a.busy() || a.opening {
 				a.quitting = true
 				a.quitPending = true
@@ -299,6 +344,14 @@ func (a *application) ready() error {
 	} else {
 		a.show()
 	}
+	if a.updateStartupReady.Path != "" {
+		if err := update.ConfirmStartup(a.updateStartupReady.Path, a.updateStartupReady.Version, a.currentVersion); err == nil {
+			_ = a.updateStore.ClearReady()
+		}
+	}
+	if a.prefs.AutoCheckUpdate {
+		a.checkForUpdate(false)
+	}
 	return nil
 }
 
@@ -352,6 +405,7 @@ func (a *application) closeTrayMenu() {
 }
 
 func (a *application) quit() {
+	a.cancelUpdateWork()
 	a.closeTrayMenu()
 	a.quitting = true
 	if a.busy() || a.opening {
@@ -422,6 +476,8 @@ func (a *application) publish(event wakeEvent) {
 	a.wakes = append(a.wakes, event)
 	a.mu.Unlock()
 	a.invalidate()
+	a.setInv.Invalidate()
+	a.updateInv.Invalidate()
 }
 
 // applyWakes is called on Viva's window thread. Every write to mutable UI
@@ -510,6 +566,67 @@ func (a *application) applyWakes() {
 				a.launchStarted = time.Time{}
 				a.notice = fmt.Sprintf(a.messages.OpenFailed, event.openErr.Error())
 			}
+		case wakeUpdateDownload:
+			if event.generation != a.updateDownloadGeneration {
+				continue
+			}
+			a.updateInv.Invalidate()
+			if event.updateProgress.Received > 0 || event.updateProgress.Total > 0 {
+				a.updateProgress = event.updateProgress
+				a.setInv.Invalidate()
+				continue
+			}
+			if a.updateDownloadCancelRequested {
+				a.updateDownloading = false
+				a.updateDownloadCancel = nil
+				a.updateDownloadCancelRequested = false
+				a.updateError = a.messages.UpdateDownloadCanceled
+			} else if event.err != nil {
+				a.updateDownloading = false
+				a.updateDownloadCancel = nil
+				if errors.Is(event.err, context.Canceled) {
+					a.updateError = a.messages.UpdateDownloadCanceled
+				} else {
+					a.updateError = event.err.Error()
+				}
+			} else if event.updatePath != "" {
+				a.updateDownloading = false
+				a.updateDownloadCancel = nil
+				a.updateError = ""
+				a.updateReady = update.ReadyState{Version: event.update.LatestVersion, Path: event.updatePath}
+				if event.update.Release.Asset != nil {
+					a.updateReady.Asset = event.update.Release.Asset.Name
+				}
+				a.updateReadyOK = false
+				if a.updateStore == nil {
+					a.updateError = "update state store is unavailable"
+				} else if err := a.updateStore.SaveReady(a.updateReady); err != nil {
+					a.updateError = err.Error()
+				} else {
+					a.updateReadyOK = true
+				}
+			}
+			a.setInv.Invalidate()
+		case wakeUpdateCheck:
+			if event.generation != a.updateCheckGeneration {
+				continue
+			}
+			a.updateInv.Invalidate()
+			a.updateChecking = false
+			a.updateCheckAutomatic = false
+			a.updateCancel = nil
+			if event.err != nil {
+				a.updateError = event.err.Error()
+			} else {
+				a.updateResult = event.update
+				if a.updateStore != nil {
+					_ = a.updateStore.SaveLastCheck(event.update)
+				}
+				if event.update.Comparison == update.ComparisonUpdateAvailable && event.update.LatestVersion != a.updatePromptDismissedVersion && !a.updateReadyOK {
+					a.openUpdateWindow()
+				}
+			}
+			a.setInv.Invalidate()
 		case wakeLaunch:
 			// An argument-free second instance still needs to raise the workspace.
 			a.showMain()

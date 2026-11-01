@@ -14,7 +14,7 @@ func TestPreferencesMigrateOnceAndKeepLegacyFile(t *testing.T) {
 	data := []byte(`{"motion":false,"appearance":"ocean","require_trust":true}`)
 	writePreferenceFixture(t, legacy, data)
 
-	want := preferences{Motion: false, Appearance: "ocean", RequireTrust: true}
+	want := preferences{Motion: false, Appearance: "ocean", RequireTrust: true, AutoCheckUpdate: true, UpdateSource: "github"}
 	if got := readPreferencesFrom(dir); got != want {
 		t.Fatalf("migration lost preferences: got %+v, want %+v", got, want)
 	}
@@ -44,7 +44,7 @@ func TestPreferenceMigrationNeverReplacesCurrentSettings(t *testing.T) {
 
 	// Covers a new settings file appearing after the initial absence check.
 	migratePreferences(current, legacy)
-	if got := readPreferencesFrom(dir); got != (preferences{Motion: true, Appearance: "sunset", RequireTrust: true}) {
+	if got := readPreferencesFrom(dir); got != (preferences{Motion: true, Appearance: "sunset", RequireTrust: true, AutoCheckUpdate: true, UpdateSource: "github"}) {
 		t.Fatalf("new settings were replaced: %+v", got)
 	}
 	got, err := os.ReadFile(current)
@@ -70,7 +70,7 @@ func TestPreferenceMigrationHandlesMissingAndInvalidFiles(t *testing.T) {
 			if test.current != "" {
 				writePreferenceFixture(t, current, []byte(test.current))
 			}
-			if got := readPreferencesFrom(dir); got != (preferences{Motion: true, Appearance: "system"}) {
+			if got := readPreferencesFrom(dir); got != (preferences{Motion: true, Appearance: "system", AutoCheckUpdate: true, UpdateSource: "github"}) {
 				t.Fatalf("missing/invalid settings did not keep defaults: %+v", got)
 			}
 			if test.current == "" {

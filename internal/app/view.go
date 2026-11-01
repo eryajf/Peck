@@ -39,12 +39,15 @@ func (a *application) paintMain(canvas *ui.Canvas, size ui.Size) {
 	// Paint the surface itself as one rounded shape as well as using the native
 	// macOS clip. The canvas/headless path then keeps the same transparent four
 	// corners even when no native window compositor is present.
-	panel := ui.Rect{Width: size.Width, Height: size.Height}
+	// Keep a clear pixel around the panel so the compositor and the headless
+	// renderer can antialias the rounded corners instead of clipping the curve
+	// against the window bounds.
+	panel := ui.Rect{X: 1, Y: 1, Width: size.Width - 2, Height: size.Height - 2}
 	canvas.Shadow(panel, appPanelCornerRadius, ui.ShadowStyle{OffsetY: 10, Blur: 30}, vivaColor(bt.visuals.GlassGlow))
-	canvas.RoundedBorder(panel, appPanelCornerRadius, 1, vivaColor(bt.visuals.GlassEdge), vivaColor(bt.visuals.BackgroundFrom.Alpha(.90)))
-	vui.NewPainter(canvas).FillGradient(vui.Rect{X: 1, Y: 1, W: size.Width - 2, H: size.Height - 2}, vui.LinearGradient{
+	vui.NewPainter(canvas).FillGradient(vui.Rect{X: panel.X + 1, Y: panel.Y + 1, W: panel.Width - 2, H: panel.Height - 2}, vui.LinearGradient{
 		From: bt.visuals.BackgroundFrom.Alpha(.90), To: bt.visuals.BackgroundTo.Alpha(.90), Angle: 45,
 	}, appPanelCornerRadius-1)
+	canvas.RoundedBorder(panel, appPanelCornerRadius, 1, vivaColor(bt.visuals.GlassEdge), vivaColor(bt.visuals.BackgroundFrom.Alpha(.90)))
 
 	// The original Peck panel is frameless. Viva keeps the same appearance and
 	// uses the declared header move region for dragging the borderless window.
@@ -436,6 +439,8 @@ func (a *application) checkbox(canvas *ui.Canvas, id ui.ID, r ui.Rect, checked b
 			a.prefs.RequireTrust = !a.prefs.RequireTrust
 			a.trusted = false
 			a.savePreferences()
+		} else if id == idAutoUpdate {
+			a.setAutoCheckUpdate(!a.prefs.AutoCheckUpdate)
 		}
 	}
 }

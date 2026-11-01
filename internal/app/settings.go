@@ -9,6 +9,7 @@ import (
 
 	"github.com/eryajf/Peck/internal/brand"
 	"github.com/eryajf/Peck/internal/i18n"
+	"github.com/eryajf/Peck/internal/update"
 	"github.com/eryajf/Peck/internal/vui"
 	vapp "github.com/vivaui/viva/app"
 	"github.com/vivaui/viva/components"
@@ -16,15 +17,17 @@ import (
 )
 
 type preferences struct {
-	Motion       bool   `json:"motion"`
-	Appearance   string `json:"appearance"`
-	RequireTrust bool   `json:"require_trust"`
-	Language     string `json:"language,omitempty"`
+	Motion          bool   `json:"motion"`
+	Appearance      string `json:"appearance"`
+	RequireTrust    bool   `json:"require_trust"`
+	Language        string `json:"language,omitempty"`
+	AutoCheckUpdate bool   `json:"auto_check_update"`
+	UpdateSource    string `json:"update_source"`
 }
 
 const (
-	settingsWidth          = 500
-	settingsHeight         = 386
+	settingsWidth          = 540
+	settingsHeight         = 600
 	settingsTitlebarHeight = 32
 	themeRowHeight         = 32
 	themeMenuRows          = 5
@@ -72,7 +75,7 @@ func readPreferences() preferences {
 }
 
 func readPreferencesFrom(dir string) preferences {
-	p := preferences{Motion: true, Appearance: "system"}
+	p := preferences{Motion: true, Appearance: "system", AutoCheckUpdate: update.DefaultAutoCheck, UpdateSource: update.DefaultSource}
 	if dir == "" {
 		return p
 	}
@@ -90,6 +93,7 @@ func readPreferencesFrom(dir string) preferences {
 		return p
 	}
 	loaded.Appearance = brand.NormalizeAppearance(loaded.Appearance)
+	loaded.UpdateSource = update.NormalizeSource(loaded.UpdateSource)
 	if legacy {
 		migratePreferences(path, data)
 	}
@@ -214,7 +218,7 @@ func (a *application) settingsConfig() vapp.Config {
 		Icon:           windowIcon(),
 		TitlebarHeight: settingsTitlebarHeight,
 		ClearColor:     transparentClearColor(), Tree: &tree, Invalidator: &a.setInv,
-		Paint: a.paintSettings, OnKey: a.settingsKey,
+		Paint: a.paintSettings, OnWake: func() { a.applyWakes() }, OnKey: a.settingsKey,
 		OnScroll: a.settingsScroll, OnPointer: a.settingsPointer,
 		OnShortcut: func(e ui.KeyEvent) ui.EventResult {
 			if e.Modifiers&ui.ModifierMeta != 0 && strings.EqualFold(e.Text, "w") {
@@ -304,6 +308,7 @@ func (a *application) paintSettings(canvas *ui.Canvas, size ui.Size) {
 	}
 	t := brand.Theme(appearance, dark)
 	v := brand.Visuals(appearance, dark)
+	bt := &brandTheme{theme: t, visuals: v}
 	canvas.FillLinearGradient(ui.Rect{Width: size.Width, Height: size.Height}, ui.LinearGradient{Start: ui.Point{}, End: ui.Point{X: size.Width, Y: size.Height}, From: vivaColor(v.BackgroundFrom), To: vivaColor(v.BackgroundTo)})
 	r := ui.Rect{X: 8, Y: 8, Width: size.Width - 16, Height: size.Height - 16}
 	canvas.RoundedBorder(r, appPanelCornerRadius, 1, vivaColor(v.GlassEdge), vivaColor(v.BackgroundFrom.Alpha(.9)))
@@ -319,19 +324,64 @@ func (a *application) paintSettings(canvas *ui.Canvas, size ui.Size) {
 	a.paintLanguageSelect(canvas, languageTrigger, t)
 	canvas.Label(a.messages.Theme, labelBounds, ui.TextStyle{Size: 14, Weight: ui.WeightSemibold, Color: vivaColor(t.Text)})
 	a.paintThemeSelect(canvas, size, t, yShift)
+
 	canvas.Fill(ui.Rect{X: 28, Y: 188 + yShift, Width: size.Width - 56, Height: 1}, vivaColor(t.Border.Alpha(.55)))
-	y := 204 + yShift
-	a.checkbox(canvas, idMotion, ui.Rect{X: 28, Y: float32(y), Width: size.Width - 56, Height: 27}, a.prefs.Motion, a.messages.Motion, false, &brandTheme{theme: t, visuals: v})
-	a.checkbox(canvas, idRequire, ui.Rect{X: 28, Y: float32(y + 35), Width: size.Width - 56, Height: 27}, a.prefs.RequireTrust, a.messages.RequireTrust, false, &brandTheme{theme: t, visuals: v})
+	y := float32(204 + yShift)
+	a.checkbox(canvas, idMotion, ui.Rect{X: 28, Y: y, Width: size.Width - 56, Height: 27}, a.prefs.Motion, a.messages.Motion, false, bt)
+	a.checkbox(canvas, idRequire, ui.Rect{X: 28, Y: y + 35, Width: size.Width - 56, Height: 27}, a.prefs.RequireTrust, a.messages.RequireTrust, false, bt)
 	shortcutLabel := a.messages.Shortcut
 	if a.shortcutError != "" {
 		shortcutLabel = a.messages.ShortcutUnavailable
 	}
-	canvas.Label(shortcutLabel, ui.Rect{X: 28, Y: 279 + yShift, Width: size.Width - 56, Height: 18}, ui.TextStyle{Size: 10, Color: vivaColor(t.TextMuted)})
-	if a.button(canvas, idQuit, ui.Rect{X: size.Width - 180, Y: size.Height - 45, Width: 72, Height: 30}, a.messages.Quit, false, false, &brandTheme{theme: t, visuals: v}) {
+	canvas.Label(shortcutLabel, ui.Rect{X: 28, Y: y + 70, Width: size.Width - 56, Height: 18}, ui.TextStyle{Size: 10, Color: vivaColor(t.TextMuted)})
+
+	sectionY := y + 108
+	canvas.Fill(ui.Rect{X: 28, Y: sectionY, Width: size.Width - 56, Height: 1}, vivaColor(t.Border.Alpha(.55)))
+	canvas.Label(a.messages.Version+"  Peck "+a.currentVersion, ui.Rect{X: 28, Y: sectionY + 14, Width: size.Width - 56, Height: 20}, ui.TextStyle{Size: 12, Color: vivaColor(t.TextMuted)})
+
+	updateY := sectionY + 52
+	linksY := size.Height - 45
+	updateBottom := linksY - 12
+	updateCard := ui.Rect{X: 28, Y: updateY, Width: size.Width - 56, Height: updateBottom - updateY}
+	canvas.RoundedBorder(updateCard, 12, 1, vivaColor(t.Border.Alpha(.72)), vivaColor(t.Surface.Alpha(.42)))
+	canvas.Label(a.messages.Updates, ui.Rect{X: updateCard.X + 16, Y: updateCard.Y + 14, Width: 120, Height: 22}, ui.TextStyle{Size: 14, Weight: ui.WeightSemibold, Color: vivaColor(t.Text)})
+	a.checkbox(canvas, idAutoUpdate, ui.Rect{X: updateCard.X + 16, Y: updateCard.Y + 45, Width: updateCard.Width - 32, Height: 27}, a.prefs.AutoCheckUpdate, a.messages.AutoCheckUpdates, false, bt)
+	canvas.Label(a.messages.UpdateChannel, ui.Rect{X: updateCard.X + 16, Y: updateCard.Y + 88, Width: 100, Height: 24}, ui.TextStyle{Size: 12, Color: vivaColor(t.TextMuted)})
+	a.paintUpdateSource(canvas, ui.Rect{X: updateCard.X + 130, Y: updateCard.Y + 82, Width: 190, Height: 34}, t)
+	status := a.updateStatusText()
+	actionY := updateBottom - 38
+	if status != "" {
+		canvas.Label(status, ui.Rect{X: updateCard.X + 16, Y: actionY + 5, Width: updateCard.Width - 170, Height: 22}, ui.TextStyle{Size: 11, Color: vivaColor(t.TextMuted)})
+	}
+	updateLabel := a.messages.CheckUpdates
+	updateDisabled := a.updateChecking || a.updateDownloading || a.busy() || a.opening || a.dialog || a.quitting || a.quitPending
+	if a.updateReadyOK {
+		updateLabel = a.messages.ApplyUpdate
+	} else if a.updateResult.Comparison == update.ComparisonUpdateAvailable {
+		updateLabel = a.messages.DownloadUpdate
+	}
+	if a.button(canvas, idCheckUpdate, ui.Rect{X: updateCard.X + updateCard.Width - 132, Y: actionY, Width: 116, Height: 32}, updateLabel, updateDisabled, true, bt) {
+		if a.updateReadyOK {
+			a.applyUpdate()
+		} else if a.updateResult.Comparison == update.ComparisonUpdateAvailable {
+			a.downloadUpdate()
+		} else {
+			a.checkForUpdate(true)
+		}
+	}
+
+	// Keep project and donation links in the lower-left utility area, away from
+	// the update card's primary action.
+	if a.linkButton(canvas, idProject, ui.Rect{X: 28, Y: linksY, Width: 92, Height: 30}, a.messages.Project, bt) {
+		a.openExternalURL(projectURL)
+	}
+	if a.linkButton(canvas, idDonate, ui.Rect{X: 128, Y: linksY, Width: 92, Height: 30}, a.messages.Donate, bt) {
+		a.openExternalURL(donateURL)
+	}
+	if a.button(canvas, idQuit, ui.Rect{X: size.Width - 180, Y: size.Height - 45, Width: 72, Height: 30}, a.messages.Quit, false, false, bt) {
 		a.quit()
 	}
-	if a.button(canvas, idBack, ui.Rect{X: size.Width - 98, Y: size.Height - 45, Width: 70, Height: 30}, a.messages.Back, false, true, &brandTheme{theme: t, visuals: v}) {
+	if a.button(canvas, idBack, ui.Rect{X: size.Width - 98, Y: size.Height - 45, Width: 70, Height: 30}, a.messages.Back, false, true, bt) {
 		a.closeSettings()
 	}
 }
@@ -346,6 +396,41 @@ func languageRowGeometry(size ui.Size, yShift float32) (ui.Rect, ui.Rect) {
 	label := ui.Rect{X: left, Y: 80 + yShift, Width: column, Height: 36}
 	trigger := ui.Rect{X: left + column + themeColumnGap, Y: label.Y, Width: column, Height: 36}
 	return label, trigger
+}
+
+func (a *application) linkButton(canvas *ui.Canvas, id ui.ID, bounds ui.Rect, label string, bt *brandTheme) bool {
+	canvas.RoundedBorder(bounds, 8, 1, vivaColor(bt.theme.Border), vivaColor(bt.theme.Surface))
+	canvas.LabelCenter(label, bounds, ui.TextStyle{Size: 10, Weight: ui.WeightMedium, Color: vivaColor(bt.theme.Accent)})
+	canvas.HitWithOptions(id, bounds, label, ui.HitOptions{Role: ui.RoleLink})
+	return canvas.Clicked(id)
+}
+
+func (a *application) paintUpdateSource(canvas *ui.Canvas, bounds ui.Rect, theme *vui.Theme) {
+	canvas.RoundedBorder(bounds, 8, 1, vivaColor(theme.Border), vivaColor(theme.Surface))
+	left := ui.Rect{X: bounds.X + 3, Y: bounds.Y + 3, Width: bounds.Width/2 - 4, Height: bounds.Height - 6}
+	right := ui.Rect{X: bounds.X + bounds.Width/2 + 1, Y: bounds.Y + 3, Width: bounds.Width/2 - 4, Height: bounds.Height - 6}
+	paint := func(r ui.Rect, label, source string) {
+		selected := a.prefs.UpdateSource == source
+		fill, color := theme.Surface, theme.TextMuted
+		if selected {
+			fill, color = theme.Accent, theme.AccentText
+		}
+		canvas.Rounded(r, 6, vivaColor(fill))
+		canvas.LabelCenter(label, r, ui.TextStyle{Size: 10, Weight: ui.WeightMedium, Color: vivaColor(color)})
+	}
+	paint(left, a.messages.GitHub, update.SourceGitHub)
+	paint(right, a.messages.CNB, update.SourceCNB)
+	optionScope := tree.Sub(settingsFeature, tree.Name("update-source-option"))
+	canvas.HitWithOptions(idUpdateSource, bounds, a.messages.UpdateChannel, ui.HitOptions{Role: ui.RoleRadio, Checked: true})
+	canvas.HitWithOptions(optionScope.At(0), left, a.messages.GitHub, ui.HitOptions{Role: ui.RoleRadio, Checked: a.prefs.UpdateSource == update.SourceGitHub, Disabled: a.updateDownloading || a.quitting || a.quitPending})
+	canvas.HitWithOptions(optionScope.At(1), right, a.messages.CNB, ui.HitOptions{Role: ui.RoleRadio, Checked: a.prefs.UpdateSource == update.SourceCNB, Disabled: a.updateDownloading || a.quitting || a.quitPending})
+	if index, ok := canvas.ClickedIn(optionScope); ok && !a.updateDownloading && !a.quitting && !a.quitPending {
+		if index == 0 {
+			a.setUpdateSource(update.SourceGitHub)
+		} else if index == 1 {
+			a.setUpdateSource(update.SourceCNB)
+		}
+	}
 }
 
 func (a *application) paintLanguageSelect(canvas *ui.Canvas, bounds ui.Rect, theme *vui.Theme) {
