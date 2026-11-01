@@ -1,0 +1,50 @@
+name: Sync code to CNB
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['**']
+    tags: ['*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cnb-code-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Push the updated ref to CNB
+        env:
+          CNB_USERNAME: ${{ secrets.CNB_USERNAME }}
+          CNB_TOKEN: ${{ secrets.CNB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          : "${CNB_USERNAME:?Missing CNB_USERNAME secret}"
+          : "${CNB_TOKEN:?Missing CNB_TOKEN secret}"
+          askpass="$RUNNER_TEMP/cnb-askpass"
+          printf '%s\n' '#!/bin/sh' 'case "$1" in *Username*) printf "%s\n" "$CNB_USERNAME" ;; *) printf "%s\n" "$CNB_TOKEN" ;; esac' > "$askpass"
+          chmod 700 "$askpass"
+          export GIT_ASKPASS="$askpass" GIT_TERMINAL_PROMPT=0
+          if [[ "$GITHUB_EVENT_NAME" == workflow_dispatch ]]; then
+            git fetch origin '+refs/heads/*:refs/remotes/origin/*' '+refs/tags/*:refs/tags/*'
+            while IFS= read -r ref; do
+              branch="${ref#refs/remotes/origin/}"
+              [[ "$branch" == HEAD ]] && continue
+              git push https://cnb.cool/znb/Peck.git "${ref}:refs/heads/${branch}"
+            done < <(git for-each-ref --format='%(refname)' refs/remotes/origin/)
+            git push https://cnb.cool/znb/Peck.git --tags
+          elif [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            source="$GITHUB_REF"
+            git push https://cnb.cool/znb/Peck.git "${source}:${GITHUB_REF}"
+          else
+            git push https://cnb.cool/znb/Peck.git "HEAD:${GITHUB_REF}"
+          fi

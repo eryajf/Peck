@@ -1,0 +1,89 @@
+name-template: "v$RESOLVED_VERSION"
+tag-template: "v$RESOLVED_VERSION"
+category-template: "### $TITLE"
+change-template: "- $TITLE (#$NUMBER) @$AUTHOR"
+change-title-escapes: '\<*_&`'
+no-changes-template: "- No merged pull requests were included in this release."
+no-contributors-template: "No contributors listed for this release."
+sort-by: merged_at
+sort-direction: descending
+exclude-labels:
+  - skip-changelog
+exclude-contributors:
+  - github-actions[bot]
+
+categories:
+  - title: "Features"
+    labels:
+      - feature
+      - enhancement
+      - feat
+  - title: "Bug Fixes"
+    labels:
+      - fix
+      - bug
+      - bugfix
+  - title: "CI and Release"
+    labels:
+      - ci
+      - workflow
+      - release
+      - dependencies
+      - build
+  - title: "Docs and Tests"
+    labels:
+      - docs
+      - documentation
+      - test
+      - tests
+  - title: "Maintenance"
+    labels:
+      - chore
+      - refactor
+      - perf
+      - optimization
+
+autolabeler:
+  - label: "feature"
+    branch:
+      - '/^(feat|feature)\/.+/'
+    title:
+      - '/^(feat|feature)(\(.+\))?:/i'
+  - label: "fix"
+    branch:
+      - '/^(fix|bugfix|hotfix)\/.+/'
+    title:
+      - '/^(fix|bugfix|hotfix)(\(.+\))?:/i'
+  - label: "docs"
+    files:
+      - "**/*.md"
+      - "docs/**"
+    title:
+      - '/^docs(\(.+\))?:/i'
+  - label: "ci"
+    files:
+      - ".github/**"
+    title:
+      - '/^(ci|workflow)(\(.+\))?:/i'
+  - label: "dependencies"
+    files:
+      - "go.mod"
+      - "go.sum"
+      - "**/package-lock.json"
+      - "**/pnpm-lock.yaml"
+    title:
+      - '/^(deps|build)(\(.+\))?:/i'
+  - label: "test"
+    files:
+      - "**/*_test.go"
+    title:
+      - '/^test(\(.+\))?:/i'
+
+template: |
+  ## Changes
+
+  $CHANGES
+
+  ## Contributors
+
+  $CONTRIBUTORS

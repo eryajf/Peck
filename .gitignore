@@ -31,6 +31,15 @@ go.work.sum
 *.swo
 *~
 
+# Local AI agent configuration
+/.agents/
+/.claude/
+/.codex/
+/.cursor/
+/.gemini/
+/.opencode/
+/.windsurf/
+
 # Private brand source masters
 /internal/brand/assets/logo/
 /internal/brand/assets/macos/
