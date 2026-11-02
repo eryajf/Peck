@@ -88,26 +88,25 @@ function escapeHTML(value) {
   return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
 }
 
-function deeplink(project) {
+function landingLink(project) {
   const params = new URLSearchParams({ v: "1", project: project.name, bundle_id: project.bundle_id });
   if (project.release) params.set("release", project.release);
   params.set("homepage", project.homepage);
-  return `peck://prepare?${params.toString()}`;
+  return `https://eryajf.github.io/Peck/?${params.toString()}`;
 }
 
 function render(projects) {
   const lines = [
     beginMarker,
     "",
-    "| 项目 | 说明 | 签名与隔离标记核对 | Deeplink 跳转 |",
-    "| --- | --- | --- | --- |",
+    "| 项目 | 说明 | 使用 Peck |",
+    "| --- | --- | --- |",
   ];
   for (const project of projects) {
     const openLabel = escapeHTML(`使用 Peck 打开 ${project.name}`);
-    const status = `${escapeTable(project.status)}（[依据](${escapeHTML(project.status_url)})）`;
-    const link = deeplink(project);
+    const link = landingLink(project);
     lines.push(
-      `| [${escapeTable(project.name)}](${project.homepage}) | ${escapeTable(project.description)} | ${status} | [<img src="assets/peck-icon.svg" width="24" alt="${openLabel}"> 使用 Peck 处理](${link} "${openLabel}")<br><code>${escapeHTML(link)}</code> |`,
+      `| [${escapeTable(project.name)}](${project.homepage}) | ${escapeTable(project.description)} | [<img src="assets/peck-badge.svg" width="124" height="24" alt="${openLabel}">](${link} "${openLabel}") |`,
     );
   }
   lines.push("", endMarker);
