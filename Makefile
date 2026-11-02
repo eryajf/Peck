@@ -49,7 +49,7 @@ package-dmg: ## 构建未签名的 macOS App、ZIP 和 DMG
 	CGO_ENABLED=$(CGO_ENABLED) $(GO) tool viva package --format app,zip,dmg --no-sign $(ARGS)
 
 render-projects: ## 校验项目清单并更新 README 表格
-	node scripts/render-unsigned-projects.mjs --write
+	node .github/scripts/render-project-links.mjs --write
 
 clean: ## 删除本地构建产物
 	rm -rf $(BUILD_DIR)

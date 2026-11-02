@@ -5,11 +5,11 @@ import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const dataPath = path.join(root, "data", "unsigned-projects.json");
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
+const dataPath = path.join(root, "data", "project-links.json");
 const readmePath = path.join(root, "README.md");
-const beginMarker = "<!-- BEGIN UNSIGNED PROJECTS -->";
-const endMarker = "<!-- END UNSIGNED PROJECTS -->";
+const beginMarker = "<!-- BEGIN PROJECT LINKS -->";
+const endMarker = "<!-- END PROJECT LINKS -->";
 const bundleIDPattern = /^[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*$/;
 
 function fail(message) {
@@ -48,7 +48,7 @@ function loadProjects() {
     fail(`unable to read ${path.relative(root, dataPath)}: ${error.message}`);
   }
   if (!data || !Array.isArray(data.projects)) {
-    fail("data/unsigned-projects.json must contain a projects array");
+    fail("data/project-links.json must contain a projects array");
   }
 
   const names = new Set();
@@ -59,8 +59,11 @@ function loadProjects() {
     }
     const name = requireString(project.name, "name", index, { maxLength: 128 });
     const description = requireString(project.description, "description", index, { maxLength: 240 });
+    project.description_en = requireString(project.description_en, "description_en", index, { maxLength: 240 });
     project.homepage = requireHTTPS(project.homepage, "homepage", index);
     project.icon = requireHTTPS(project.icon, "icon", index);
+    project.status = requireString(project.status, "status", index, { maxLength: 512 });
+    project.status_url = requireHTTPS(project.status_url, "status_url", index);
     const bundleID = requireString(project.bundle_id, "bundle_id", index, { maxLength: 255 });
     if (!bundleIDPattern.test(bundleID)) {
       fail(`projects[${index}].bundle_id is not a valid macOS bundle identifier`);
@@ -96,13 +99,15 @@ function render(projects) {
   const lines = [
     beginMarker,
     "",
-    "| 项目 | 说明 | 一键打开 |",
-    "| --- | --- | --- |",
+    "| 项目 | 说明 | 签名与隔离标记核对 | Deeplink 跳转 |",
+    "| --- | --- | --- | --- |",
   ];
   for (const project of projects) {
     const openLabel = escapeHTML(`使用 Peck 打开 ${project.name}`);
+    const status = `${escapeTable(project.status)}（[依据](${escapeHTML(project.status_url)})）`;
+    const link = deeplink(project);
     lines.push(
-      `| [${escapeTable(project.name)}](${project.homepage}) | ${escapeTable(project.description)} | [<img src="${escapeHTML(project.icon)}" width="32" alt="${openLabel}">](${deeplink(project)} "${openLabel}") |`,
+      `| [${escapeTable(project.name)}](${project.homepage}) | ${escapeTable(project.description)} | ${status} | [<img src="assets/peck-icon.svg" width="24" alt="${openLabel}"> 使用 Peck 处理](${link} "${openLabel}")<br><code>${escapeHTML(link)}</code> |`,
     );
   }
   lines.push("", endMarker);
@@ -130,7 +135,7 @@ function main() {
   }
   if (mode === "--check") {
     if (updated !== current) {
-      fail("README.md is out of date; run node scripts/render-unsigned-projects.mjs --write");
+      fail("README.md is out of date; run node .github/scripts/render-project-links.mjs --write");
     }
     console.log(`README.md is up to date with ${projects.length} project entries.`);
     return;

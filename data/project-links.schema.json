@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Peck unsigned open source projects",
+  "title": "Peck open source project links",
   "type": "object",
   "additionalProperties": false,
   "required": ["projects"],
@@ -11,10 +11,11 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["name", "description", "homepage", "bundle_id", "icon"],
+        "required": ["name", "description", "description_en", "homepage", "bundle_id", "icon", "status", "status_url"],
         "properties": {
           "name": {"type": "string", "minLength": 1, "maxLength": 128},
           "description": {"type": "string", "minLength": 1, "maxLength": 240},
+          "description_en": {"type": "string", "minLength": 1, "maxLength": 240},
           "homepage": {"type": "string", "format": "uri", "pattern": "^https://"},
           "bundle_id": {
             "type": "string",
@@ -22,7 +23,9 @@
             "maxLength": 255
           },
           "release": {"type": "string", "minLength": 1, "maxLength": 64},
-          "icon": {"type": "string", "format": "uri", "pattern": "^https://"}
+          "icon": {"type": "string", "format": "uri", "pattern": "^https://"},
+          "status": {"type": "string", "minLength": 1, "maxLength": 512},
+          "status_url": {"type": "string", "format": "uri", "pattern": "^https://"}
         }
       }
     }

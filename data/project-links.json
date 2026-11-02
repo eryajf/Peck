@@ -1,0 +1,95 @@
+{
+  "$schema": "./project-links.schema.json",
+  "projects": [
+    {
+      "name": "IINA",
+      "description": "macOS 原生视频播放器",
+      "description_en": "Native video player for macOS",
+      "homepage": "https://github.com/iina/iina",
+      "bundle_id": "com.colliderli.iina",
+      "icon": "https://github.com/iina.png?size=64",
+      "status": "无需处理：稳定版和 Beta 已签名并公证；Nightly 构建另行核验。",
+      "status_url": "https://github.com/iina/iina/wiki/FAQ"
+    },
+    {
+      "name": "Rectangle",
+      "description": "macOS 窗口管理工具",
+      "description_en": "Window management tool for macOS",
+      "homepage": "https://github.com/rxhanson/Rectangle",
+      "bundle_id": "com.knollsoft.Rectangle",
+      "icon": "https://github.com/rxhanson.png?size=64",
+      "status": "按具体版本核验；官方 README 未承诺所有构建具有相同签名状态。",
+      "status_url": "https://github.com/rxhanson/Rectangle/releases"
+    },
+    {
+      "name": "AltTab",
+      "description": "macOS 窗口切换器",
+      "description_en": "Window switcher for macOS",
+      "homepage": "https://github.com/lwouis/alt-tab-macos",
+      "bundle_id": "com.lwouis.alt-tab-macos",
+      "icon": "https://github.com/lwouis.png?size=64",
+      "status": "无需处理：官方当前预构建版本说明为已签名并公证；旧版或自行构建版本另行核验。",
+      "status_url": "https://alt-tab.app/terms"
+    },
+    {
+      "name": "Stats",
+      "description": "macOS 系统状态监视器",
+      "description_en": "System monitor for macOS",
+      "homepage": "https://github.com/exelban/stats",
+      "bundle_id": "eu.exelban.Stats",
+      "icon": "https://github.com/exelban.png?size=64",
+      "status": "按具体版本核验；项目官方安装说明未声明统一的签名状态。",
+      "status_url": "https://github.com/exelban/stats/releases"
+    },
+    {
+      "name": "Mos",
+      "description": "平滑滚动和鼠标工具",
+      "description_en": "Smooth scrolling and mouse utility",
+      "homepage": "https://github.com/Caldis/Mos",
+      "bundle_id": "com.caldis.Mos",
+      "icon": "https://github.com/Caldis.png?size=64",
+      "status": "版本相关：旧版可能需要移除隔离标记；4.0.0-beta-20251105 起官方说明已签名并公证。",
+      "status_url": "https://github.com/Caldis/Mos/wiki/If-the-App-not-work-properly"
+    },
+    {
+      "name": "Keka",
+      "description": "macOS 文件压缩与解压工具",
+      "description_en": "File archiver for macOS",
+      "homepage": "https://github.com/aonez/Keka",
+      "bundle_id": "com.aone.keka",
+      "icon": "https://github.com/aonez.png?size=64",
+      "status": "场景相关：官方仅记录部分 Safari 下载场景仍需移除隔离标记，不能据此认定所有版本都需要。",
+      "status_url": "https://github.com/aonez/Keka/wiki/Error-accessing-the-binary"
+    },
+    {
+      "name": "CotEditor",
+      "description": "轻量的 macOS 文本编辑器",
+      "description_en": "Lightweight text editor for macOS",
+      "homepage": "https://github.com/coteditor/CotEditor",
+      "bundle_id": "com.coteditor.CotEditor",
+      "icon": "https://github.com/coteditor.png?size=64",
+      "status": "无需处理：官方说明非 App Store 版本已由 Apple 公证；App Store 版本由系统管理。",
+      "status_url": "https://coteditor.com/archives"
+    },
+    {
+      "name": "KeepingYouAwake",
+      "description": "阻止 Mac 自动睡眠的小工具",
+      "description_en": "Utility that prevents your Mac from sleeping",
+      "homepage": "https://github.com/newmarcel/KeepingYouAwake",
+      "bundle_id": "info.marcel-dierkes.KeepingYouAwake",
+      "icon": "https://github.com/newmarcel.png?size=64",
+      "status": "无需处理：项目变更记录曾明确说明发行版使用 Developer ID 签名；具体旧版本仍应现场核验。",
+      "status_url": "https://github.com/newmarcel/KeepingYouAwake/blob/main/CHANGELOG.md"
+    },
+    {
+      "name": "Motrix",
+      "description": "全能下载管理器",
+      "description_en": "Full-featured download manager",
+      "homepage": "https://github.com/agalwood/Motrix",
+      "bundle_id": "app.motrix.native",
+      "icon": "https://github.com/agalwood.png?size=64",
+      "status": "无需处理：当前 macOS DMG 和 ZIP 发布包已签名并公证；旧版或自建包另行核验。",
+      "status_url": "https://github.com/agalwood/Motrix/releases"
+    }
+  ]
+}
