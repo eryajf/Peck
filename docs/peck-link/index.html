@@ -6,7 +6,7 @@
   <title>交给 Peck 处理</title>
   <style>
     body { margin: 0; background: #faf7ef; color: #183f35; font: 16px/1.7 -apple-system, BlinkMacSystemFont, sans-serif; }
-    main { max-width: 620px; margin: 12vh auto; padding: 0 24px; }
+    main { max-width: 960px; margin: 8vh auto; padding: 0 24px 48px; }
     h1 { font-size: 32px; line-height: 1.3; }
     p { color: #65746c; }
     .launch { display: inline-flex; align-items: center; gap: 10px; padding: 10px 18px; border: 1px solid #a9bbaa; border-radius: 12px; background: #fffdf5; color: #183f35; text-decoration: none; font-weight: 600; }
@@ -14,12 +14,29 @@
     .launch:focus-visible { outline: 3px solid #d85d48; outline-offset: 4px; }
     .launch img { width: 32px; height: 32px; }
     .error { color: #9a3827; }
+    [hidden] { display: none !important; }
+    .search { width: min(100%, 400px); box-sizing: border-box; padding: 12px; border: 1px solid #a9bbaa; border-radius: 10px; background: #fffdf5; font: inherit; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-top: 20px; }
+    .card { padding: 20px; border: 1px solid #d4ddd2; border-radius: 14px; background: #fffdf5; }
+    .card h2 { margin: 0; font-size: 20px; }
+    .card p { min-height: 3em; }
+    .card .launch { padding: 7px 12px; }
+    .card .repo { margin-left: 12px; color: #183f35; }
+    a:focus-visible, input:focus-visible { outline: 3px solid #d85d48; outline-offset: 4px; }
   </style>
 </head>
 <body>
   <main>
     <h1>应用打不开？<br>交给 Peck 处理。</h1>
-    <p id="context">正在读取项目链接…</p>
+    <section id="catalog" hidden aria-labelledby="catalog-title">
+      <h2 id="catalog-title">开源项目目录</h2>
+      <p>查找项目；如果应用可以正常打开，就无需使用 Peck。</p>
+      <label for="search">搜索项目</label><br>
+      <input id="search" class="search" type="search" placeholder="搜索项目名称或说明">
+      <p id="catalog-message" role="status">正在加载项目…</p>
+      <div id="cards" class="cards"></div>
+    </section>
+    <p id="context" hidden></p>
     <a id="launch" class="launch" hidden><img src="peck-icon.svg" alt="">交给 Peck 处理</a>
     <p>请先安装并运行 Peck。点击按钮后，在 Peck 中核对本机应用；处理操作需要你确认。</p>
     <p><a href="https://github.com/eryajf/Peck/releases">下载 Peck</a> · <a href="https://github.com/eryajf/Peck">了解 Peck</a></p>
@@ -30,7 +47,37 @@
     const input = new URLSearchParams(location.search);
     const allowed = new Set(["v", "project", "bundle_id", "release", "homepage"]);
     const unsafe = /[\p{Cc}\p{Cf}]/u;
-    try {
+    if (!location.search) {
+      document.getElementById("catalog").hidden = false;
+      const cards = document.getElementById("cards");
+      const message = document.getElementById("catalog-message");
+      const search = document.getElementById("search");
+      fetch("project-links.json")
+        .then(response => { if (!response.ok) throw new Error(); return response.json(); })
+        .then(data => {
+          function render() {
+            const query = search.value.trim().toLowerCase();
+            const matches = data.projects.filter(p => [p.name, p.description, p.description_en].some(value => value.toLowerCase().includes(query)));
+            cards.replaceChildren();
+            for (const project of matches) {
+              const card = document.createElement("article"); card.className = "card";
+              const title = document.createElement("h2"); title.textContent = project.name;
+              const desc = document.createElement("p"); desc.textContent = project.description;
+              const launch = document.createElement("a"); launch.className = "launch"; launch.textContent = "交给 Peck 处理";
+              const params = new URLSearchParams({v: "1", project: project.name, bundle_id: project.bundle_id});
+              if (project.release) params.set("release", project.release);
+              params.set("homepage", project.homepage);
+              launch.href = `peck://prepare?${params}`;
+              const repo = document.createElement("a"); repo.className = "repo"; repo.href = project.homepage; repo.textContent = "项目主页 ↗";
+              card.append(title, desc, launch, repo); cards.append(card);
+            }
+            message.textContent = matches.length ? `共 ${matches.length} 个项目` : "没有匹配的项目。";
+          }
+          search.addEventListener("input", render); render();
+        })
+        .catch(() => { message.textContent = "项目列表加载失败，请稍后重试。"; message.className = "error"; });
+    } else try {
+      context.hidden = false;
       for (const key of input.keys()) {
         const values = input.getAll(key);
         if (!allowed.has(key) || values.length !== 1 || !values[0] || unsafe.test(values[0])) throw new Error();

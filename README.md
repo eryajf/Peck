@@ -59,6 +59,8 @@ peck://prepare?v=1&project=Example%20App&bundle_id=org.example.app
 
 下面的项目清单来自 [`data/project-links.json`](data/project-links.json)。列入清单不代表应用需要处理：如果应用可以正常打开，就无需使用 Peck。遇到打开问题时，请先确认来源可信，再根据 Peck 的检查结果决定是否处理。
 
+也可以在 [Peck 项目目录](https://eryajf.github.io/Peck/)中搜索并查看所有项目。
+
 点击徽章进入 Peck 中转页，再点击页面上的按钮唤起 Peck；链接不会下载应用、传入本地路径或自动执行修改。新增项目时，请在 `projects` 中增加 `name`、`description`、`description_en`、`homepage`、`bundle_id`、`icon`、`status` 和 `status_url`。`description` 是中文说明，`description_en` 是英文说明，供后续 README 多语言版本复用。首页、图标和依据必须使用 HTTPS，`bundle_id` 必须与 App 的 `CFBundleIdentifier` 完全一致。
 
 `release` 是可选的版本匹配提示，默认不要填写。省略它时，Peck 会匹配相同 Bundle ID 的当前版本，项目发布新版本后不需要更新这份清单；只有需要精确处理某个版本，或需要在本机存在多个同 Bundle ID 应用时缩小匹配范围，才填写 `release`。它可以匹配 App 的 `CFBundleShortVersionString` 或 `CFBundleVersion`。

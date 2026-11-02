@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "docs/peck-link/**"
+      - "data/project-links.json"
       - "assets/peck-icon.svg"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
@@ -27,7 +28,9 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Prepare page
-        run: cp assets/peck-icon.svg docs/peck-link/peck-icon.svg
+        run: |
+          cp assets/peck-icon.svg docs/peck-link/peck-icon.svg
+          cp data/project-links.json docs/peck-link/project-links.json
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
