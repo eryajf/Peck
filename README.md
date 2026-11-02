@@ -31,6 +31,10 @@ Peck 不会替你判断一个应用是否安全，也不会修改系统级 Gatek
 - 确认后移除隔离标记，或按需添加本地 ad-hoc 签名，并查看处理结果。
 - 常驻菜单栏，支持中英文界面、主题切换和从项目页面唤起。
 
+## 使用演示
+
+https://github.com/user-attachments/assets/ac012996-fb92-4fad-b2c0-20e953c2e738
+
 ## 安装
 
 从 [GitHub Releases](https://github.com/eryajf/Peck/releases) 下载适合你的 Mac 的版本并安装。
