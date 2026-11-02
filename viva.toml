@@ -2,7 +2,7 @@
 name = "Peck"
 id = "com.eryajf.peck"
 version = "0.2.0"
-executable = "peck"
+executable = "Peck"
 package = "."
 icon = "internal/brand/assets/runtime/app-icon.png"
 url_schemes = ["peck"]

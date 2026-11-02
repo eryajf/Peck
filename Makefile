@@ -8,7 +8,7 @@ ARGS ?=
 
 .DEFAULT_GOAL := help
 
-.PHONY: help deps version doctor run fmt test vet check build package package-dmg clean
+.PHONY: help deps version doctor run fmt test vet check build package package-dmg render-projects clean
 
 help: ## 显示可用的快捷指令
 	@awk 'BEGIN {FS = ":.*##"; printf "用法: make <目标>\n\n目标:\n"} /^[a-zA-Z0-9_-]+:.*##/ {printf "  %-14s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -47,6 +47,9 @@ package: ## 构建未签名的 macOS App 和 ZIP
 
 package-dmg: ## 构建未签名的 macOS App、ZIP 和 DMG
 	CGO_ENABLED=$(CGO_ENABLED) $(GO) tool viva package --format app,zip,dmg --no-sign $(ARGS)
+
+render-projects: ## 校验项目清单并更新 README 表格
+	node scripts/render-unsigned-projects.mjs --write
 
 clean: ## 删除本地构建产物
 	rm -rf $(BUILD_DIR)

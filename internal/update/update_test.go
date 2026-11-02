@@ -26,8 +26,8 @@ func TestCompareVersions(t *testing.T) {
 
 func TestMatchAssetForBothArchitectures(t *testing.T) {
 	assets := []githubReleaseAsset{
-		{Name: "peck-0.2.0-darwin-arm64.zip", BrowserDownloadURL: "https://github.com/eryajf/Peck/releases/download/v0.2.0/arm64.zip", Size: 10},
-		{Name: "peck-0.2.0-darwin-amd64.zip", BrowserDownloadURL: "https://github.com/eryajf/Peck/releases/download/v0.2.0/amd64.zip", Size: 12},
+		{Name: "Peck-0.2.0-darwin-arm64.zip", BrowserDownloadURL: "https://github.com/eryajf/Peck/releases/download/v0.2.0/arm64.zip", Size: 10},
+		{Name: "Peck-0.2.0-darwin-amd64.zip", BrowserDownloadURL: "https://github.com/eryajf/Peck/releases/download/v0.2.0/amd64.zip", Size: 12},
 	}
 	for _, arch := range []string{"arm64", "amd64"} {
 		asset := matchAsset(assets, "darwin", arch)
@@ -51,7 +51,7 @@ func TestRewriteURL(t *testing.T) {
 func TestCheckUsesReleaseMetadataAndSelectedSource(t *testing.T) {
 	oldClient := httpClient
 	httpClient = &http.Client{Transport: roundTripFunc(func(*http.Request) (*http.Response, error) {
-		body := `{"tag_name":"v0.2.0","html_url":"https://github.com/eryajf/Peck/releases/tag/v0.2.0","body":"notes","published_at":"2026-05-01T00:00:00Z","assets":[{"name":"peck-0.2.0-darwin-arm64.zip","browser_download_url":"https://github.com/eryajf/Peck/releases/download/v0.2.0/peck-0.2.0-darwin-arm64.zip","size":42}]}`
+		body := `{"tag_name":"v0.2.0","html_url":"https://github.com/eryajf/Peck/releases/tag/v0.2.0","body":"notes","published_at":"2026-05-01T00:00:00Z","assets":[{"name":"Peck-0.2.0-darwin-arm64.zip","browser_download_url":"https://github.com/eryajf/Peck/releases/download/v0.2.0/Peck-0.2.0-darwin-arm64.zip","size":42}]}`
 		return &http.Response{StatusCode: http.StatusOK, Body: io.NopCloser(strings.NewReader(body))}, nil
 	})}
 	t.Cleanup(func() { httpClient = oldClient })

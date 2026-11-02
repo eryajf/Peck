@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Peck unsigned open source projects",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["projects"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "projects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "description", "homepage", "bundle_id", "icon"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1, "maxLength": 128},
+          "description": {"type": "string", "minLength": 1, "maxLength": 240},
+          "homepage": {"type": "string", "format": "uri", "pattern": "^https://"},
+          "bundle_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9-]+(?:\\.[A-Za-z0-9-]+)*$",
+            "maxLength": 255
+          },
+          "release": {"type": "string", "minLength": 1, "maxLength": 64},
+          "icon": {"type": "string", "format": "uri", "pattern": "^https://"}
+        }
+      }
+    }
+  }
+}

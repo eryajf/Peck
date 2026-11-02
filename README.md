@@ -55,6 +55,37 @@ peck://prepare?v=1&project=Example%20App&bundle_id=org.example.app
 
 `project` 用于显示项目上下文，`bundle_id` 和可选的 `release` 只用于匹配本机候选应用。深链接不能传入本地路径、命令、凭据或自动执行权限；用户仍需核对真实路径并点击确认。
 
+### 开源项目一键打开
+
+下面的项目清单来自 [`data/unsigned-projects.json`](data/unsigned-projects.json)。如果你下载了其中项目的未签名版本，或系统因为隔离标记阻止了打开，可以点击项目右侧图标，把项目上下文带入 Peck 的准备流程。新增项目时，只需提交 JSON 变更；合并后 GitHub Actions 会自动更新这张表，官网也可以直接复用这份数据。
+
+提交新项目时，请在 `projects` 中增加 `name`、`description`、`homepage`、`bundle_id` 和 `icon`。首页和图标必须使用 HTTPS，`bundle_id` 必须与 App 的 `CFBundleIdentifier` 完全一致。
+
+`release` 是可选的版本匹配提示，默认不要填写。省略它时，Peck 会匹配相同 Bundle ID 的当前版本，项目发布新版本后不需要更新这份清单；只有需要精确处理某个版本，或需要在本机存在多个同 Bundle ID 应用时缩小匹配范围，才填写 `release`。它可以匹配 App 的 `CFBundleShortVersionString` 或 `CFBundleVersion`。
+
+<!-- BEGIN UNSIGNED PROJECTS -->
+
+| 项目 | 说明 | 一键打开 |
+| --- | --- | --- |
+| [IINA](https://github.com/iina/iina) | macOS 原生视频播放器 | [<img src="https://github.com/iina.png?size=64" width="32" alt="使用 Peck 打开 IINA">](peck://prepare?v=1&project=IINA&bundle_id=com.colliderli.iina&homepage=https%3A%2F%2Fgithub.com%2Fiina%2Fiina "使用 Peck 打开 IINA") |
+| [Rectangle](https://github.com/rxhanson/Rectangle) | macOS 窗口管理工具 | [<img src="https://github.com/rxhanson.png?size=64" width="32" alt="使用 Peck 打开 Rectangle">](peck://prepare?v=1&project=Rectangle&bundle_id=com.knollsoft.Rectangle&homepage=https%3A%2F%2Fgithub.com%2Frxhanson%2FRectangle "使用 Peck 打开 Rectangle") |
+| [AltTab](https://github.com/lwouis/alt-tab-macos) | macOS 窗口切换器 | [<img src="https://github.com/lwouis.png?size=64" width="32" alt="使用 Peck 打开 AltTab">](peck://prepare?v=1&project=AltTab&bundle_id=com.lwouis.alt-tab-macos&homepage=https%3A%2F%2Fgithub.com%2Flwouis%2Falt-tab-macos "使用 Peck 打开 AltTab") |
+| [Stats](https://github.com/exelban/stats) | macOS 系统状态监视器 | [<img src="https://github.com/exelban.png?size=64" width="32" alt="使用 Peck 打开 Stats">](peck://prepare?v=1&project=Stats&bundle_id=eu.exelban.Stats&homepage=https%3A%2F%2Fgithub.com%2Fexelban%2Fstats "使用 Peck 打开 Stats") |
+| [Mos](https://github.com/Caldis/Mos) | 平滑滚动和鼠标工具 | [<img src="https://github.com/Caldis.png?size=64" width="32" alt="使用 Peck 打开 Mos">](peck://prepare?v=1&project=Mos&bundle_id=com.caldis.Mos&homepage=https%3A%2F%2Fgithub.com%2FCaldis%2FMos "使用 Peck 打开 Mos") |
+| [Keka](https://github.com/aonez/Keka) | macOS 文件压缩与解压工具 | [<img src="https://github.com/aonez.png?size=64" width="32" alt="使用 Peck 打开 Keka">](peck://prepare?v=1&project=Keka&bundle_id=com.aone.keka&homepage=https%3A%2F%2Fgithub.com%2Faonez%2FKeka "使用 Peck 打开 Keka") |
+| [CotEditor](https://github.com/coteditor/CotEditor) | 轻量的 macOS 文本编辑器 | [<img src="https://github.com/coteditor.png?size=64" width="32" alt="使用 Peck 打开 CotEditor">](peck://prepare?v=1&project=CotEditor&bundle_id=com.coteditor.CotEditor&homepage=https%3A%2F%2Fgithub.com%2Fcoteditor%2FCotEditor "使用 Peck 打开 CotEditor") |
+| [KeepingYouAwake](https://github.com/newmarcel/KeepingYouAwake) | 阻止 Mac 自动睡眠的小工具 | [<img src="https://github.com/newmarcel.png?size=64" width="32" alt="使用 Peck 打开 KeepingYouAwake">](peck://prepare?v=1&project=KeepingYouAwake&bundle_id=com.keepingu.KeepingYouAwake&homepage=https%3A%2F%2Fgithub.com%2Fnewmarcel%2FKeepingYouAwake "使用 Peck 打开 KeepingYouAwake") |
+| [Motrix](https://github.com/agalwood/Motrix) | 全能下载管理器 | [<img src="https://github.com/agalwood.png?size=64" width="32" alt="使用 Peck 打开 Motrix">](peck://prepare?v=1&project=Motrix&bundle_id=net.agalwood.Motrix&homepage=https%3A%2F%2Fgithub.com%2Fagalwood%2FMotrix "使用 Peck 打开 Motrix") |
+
+<!-- END UNSIGNED PROJECTS -->
+
+贡献者可以在本地校验清单并生成 README：
+
+```sh
+node scripts/render-unsigned-projects.mjs --validate
+node scripts/render-unsigned-projects.mjs --write
+```
+
 ## 开发与构建
 
 需要 macOS 14 或更高版本，以及 Go 1.27.3 或更高版本。项目直接使用官方 `github.com/vivaui/viva` 模块：
