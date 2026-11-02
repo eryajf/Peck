@@ -1,0 +1,199 @@
+@import "tailwindcss";
+
+/* Google Fonts loaded via <link> in index.html */
+
+/* ===== Terminal / Hacker Theme (Homepage + Blog) ===== */
+.terminal-theme {
+  --bg-color: #0c0c0c;
+  --text-primary: #cccccc;
+  --text-secondary: #888888;
+  --accent-color: #00ff41;
+  --accent-hover: #00cc33;
+  --error-color: #ff3333;
+  --border-color: #333333;
+  --font-mono: 'Fira Code', 'Courier New', Courier, monospace;
+  --terminal-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  line-height: 1.6;
+  overflow-x: hidden;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.terminal-theme::before {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  z-index: 2;
+  background-size: 100% 2px, 3px 100%;
+  pointer-events: none;
+}
+
+.terminal-theme a {
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+  border-bottom: 1px dashed var(--text-secondary);
+}
+
+.terminal-theme a:hover {
+  color: var(--accent-color);
+  border-bottom: 1px solid var(--accent-color);
+  text-shadow: 0 0 5px var(--accent-color);
+}
+
+.terminal-container {
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 3;
+}
+
+.terminal-theme h1, .terminal-theme h2, .terminal-theme h3,
+.terminal-theme h4, .terminal-theme h5, .terminal-theme h6 {
+  font-weight: 700;
+  color: var(--accent-color);
+  margin-bottom: 1rem;
+}
+
+.cursor {
+  display: inline-block;
+  width: 10px;
+  height: 1.2em;
+  background-color: #00ff41;
+  animation: blink 1s step-end infinite;
+  vertical-align: text-bottom;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ===== Peck desktop landing ===== */
+.peck-desktop-stage {
+  position: absolute;
+  inset: 1.5rem 1rem 5.5rem;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 2rem;
+  background: radial-gradient(circle at 75% 15%, rgba(255, 218, 145, 0.16), transparent 28%), linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(10, 20, 30, 0.08));
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.16), 0 1rem 3rem rgba(0, 0, 0, 0.14);
+  backdrop-filter: blur(3px) saturate(120%);
+  -webkit-backdrop-filter: blur(3px) saturate(120%);
+}
+
+.peck-desktop-stage::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 13%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+}
+
+.peck-desktop-stage__title {
+  position: absolute;
+  left: 1.1rem;
+  top: 1rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.68rem;
+}
+
+.peck-desktop-stage__eyebrow { font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.peck-desktop-stage__status { color: rgba(255, 255, 255, 0.48); }
+.peck-desktop-stage__hint { position: absolute; left: 1.1rem; bottom: 0.85rem; z-index: 2; color: rgba(255, 255, 255, 0.42); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.62rem; letter-spacing: 0.05em; }
+
+.peck-desktop-app {
+  position: absolute;
+  z-index: 2;
+  width: 4.4rem;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.peck-desktop-app__icon { position: relative; display: flex; width: 3.4rem; height: 3.4rem; margin: 0 auto; align-items: center; justify-content: center; border-radius: 0.9rem; filter: drop-shadow(0 0.45rem 0.4rem rgba(0, 0, 0, 0.24)); }
+.peck-desktop-app__icon img { width: 100%; height: 100%; object-fit: contain; }
+.peck-desktop-app__label { display: block; margin-top: 0.25rem; color: rgba(255, 255, 255, 0.84); font-size: 0.65rem; font-weight: 600; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5); }
+.peck-desktop-app__wings { position: absolute; inset: 0.72rem -0.5rem auto; display: flex; justify-content: space-between; opacity: 0; pointer-events: none; }
+.peck-desktop-app__wings i { width: 1.18rem; height: 1.7rem; border-radius: 100% 20% 70% 20%; background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(120, 190, 255, 0.74)); box-shadow: 0 0 0.45rem rgba(255, 255, 255, 0.45); }
+.peck-desktop-app__wings i:last-child { transform: scaleX(-1); }
+.peck-desktop-app--target .peck-desktop-app__icon { animation: peck-target-shiver 0.16s ease-in-out infinite alternate; }
+.peck-desktop-app--target .peck-desktop-app__label { color: rgba(255, 246, 214, 0.96); }
+.peck-desktop-app--flying .peck-desktop-app__icon { animation: peck-app-takeoff 0.85s cubic-bezier(0.2, 0.85, 0.35, 1) forwards; }
+.peck-desktop-app--flying .peck-desktop-app__label { animation: peck-label-fade 0.55s ease-out forwards; }
+.peck-desktop-app--flying .peck-desktop-app__wings { opacity: 1; animation: peck-wings 0.13s ease-in-out infinite alternate; }
+.peck-desktop-app__spark { position: absolute; z-index: 4; width: 0.25rem; height: 0.25rem; border-radius: 999px; background: #fff2b8; opacity: 0; box-shadow: 0 0 0.35rem #fff2b8; }
+.peck-desktop-app--flying .peck-desktop-app__spark--one { animation: peck-spark-one 0.75s ease-out forwards; }
+.peck-desktop-app--flying .peck-desktop-app__spark--two { animation: peck-spark-two 0.8s ease-out 0.08s forwards; }
+
+.peck-bug { position: absolute; left: 50%; top: -0.55rem; z-index: 3; display: block; width: 1.45rem; height: 1.45rem; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.35)); transform: translateX(-50%) rotate(-12deg); transform-origin: 50% 80%; }
+.peck-bug svg { width: 100%; height: 100%; overflow: visible; }
+.peck-bug--green { filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.35)); }
+.peck-bug--blue { filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.35)); }
+.peck-bug--gold { filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.35)); }
+.peck-bug--eaten { animation: peck-bug-eaten 0.46s cubic-bezier(0.2, 0.8, 0.25, 1) forwards; }
+
+.peck-woodpecker { position: absolute; z-index: 4; width: clamp(4.7rem, 7.4vw, 6.5rem); height: clamp(5.3rem, 8vw, 7.2rem); filter: drop-shadow(0 0.65rem 0.45rem rgba(0, 0, 0, 0.3)); will-change: left, top; }
+.peck-woodpecker__body { position: absolute; inset: 0.1rem 0 0.8rem; transform-origin: 50% 84%; }
+.peck-woodpecker__svg { width: 100%; height: 100%; overflow: visible; }
+.peck-bird-svg__body, .peck-bird-svg__head { transform-box: fill-box; transform-origin: center; }
+.peck-woodpecker__feet { position: absolute; z-index: 2; left: 23%; right: 15%; bottom: 0.35rem; display: flex; justify-content: space-between; }
+.peck-woodpecker__feet i { display: block; width: 0.72rem; height: 0.18rem; border-radius: 100%; background: #d87b3a; transform: rotate(14deg); transform-origin: right center; }
+.peck-woodpecker__feet i:last-child { transform: rotate(-14deg); }
+.peck-woodpecker__motion { position: absolute; inset: auto 8% 0; height: 0.42rem; border-radius: 100%; background: rgba(0, 0, 0, 0.22); filter: blur(4px); }
+.peck-woodpecker__beak { position: absolute; right: 1%; top: 38%; width: 0.72rem; height: 0.34rem; border-radius: 0 100% 100% 0; background: #ed9f45; transform-origin: left center; }
+.peck-woodpecker__dust { position: absolute; left: 8%; bottom: 0.9rem; width: 2rem; height: 1.3rem; opacity: 0; }
+.peck-woodpecker__dust i { position: absolute; bottom: 0; width: 0.22rem; height: 0.22rem; border-radius: 999px; background: rgba(255, 255, 255, 0.55); }
+.peck-woodpecker__dust i:nth-child(1) { left: 0; }
+.peck-woodpecker__dust i:nth-child(2) { left: 0.75rem; bottom: 0.35rem; }
+.peck-woodpecker__dust i:nth-child(3) { left: 1.5rem; bottom: 0.1rem; }
+.peck-woodpecker--walking .peck-woodpecker__body { animation: peck-walk-body 0.32s ease-in-out infinite alternate; }
+.peck-woodpecker--walking .peck-woodpecker__feet { animation: peck-walk-feet 0.32s steps(2, end) infinite; }
+.peck-woodpecker--walking .peck-woodpecker__dust { animation: peck-dust 0.32s steps(2, end) infinite; }
+.peck-woodpecker--pecking .peck-woodpecker__body { animation: peck-body-thrust 0.18s ease-in-out infinite alternate; }
+.peck-woodpecker--pecking .peck-bird-svg__head { animation: peck-head-thrust 0.18s ease-in-out infinite alternate; }
+.peck-woodpecker--pecking .peck-woodpecker__beak { animation: peck-beak 0.18s ease-in-out infinite alternate; }
+.peck-woodpecker--eating .peck-woodpecker__body { animation: peck-swallow 0.42s ease-in-out 2; }
+
+@keyframes peck-walk-body { from { transform: translateY(0) rotate(-4deg); } to { transform: translateY(-0.28rem) rotate(4deg); } }
+@keyframes peck-walk-feet { 0%, 100% { transform: translateX(-0.08rem) rotate(8deg); } 50% { transform: translateX(0.12rem) rotate(-8deg); } }
+@keyframes peck-dust { 0%, 100% { opacity: 0; transform: translateX(0) scale(0.7); } 45% { opacity: 0.55; transform: translateX(-0.25rem) scale(1); } }
+@keyframes peck-body-thrust { from { transform: translate(0, 0) rotate(1deg); } to { transform: translate(0.32rem, 0.18rem) rotate(-8deg); } }
+@keyframes peck-head-thrust { from { transform: translate(0, 0) rotate(0); } to { transform: translate(0.45rem, 0.4rem) rotate(-7deg); } }
+@keyframes peck-beak { from { transform: scaleX(1); } to { transform: translateX(0.28rem) scaleX(0.5); } }
+@keyframes peck-swallow { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-0.18rem) rotate(4deg); } }
+@keyframes peck-target-shiver { from { transform: translateX(-0.04rem) rotate(-1deg); } to { transform: translateX(0.04rem) rotate(1deg); } }
+@keyframes peck-bug-eaten { to { opacity: 0; transform: translate(calc(-50% + var(--bug-drift)), 1.65rem) scale(0.18) rotate(360deg); } }
+@keyframes peck-wings { from { transform: translateY(0) rotate(-8deg); } to { transform: translateY(-0.2rem) rotate(8deg); } }
+@keyframes peck-app-takeoff { 0% { transform: translateY(0) rotate(0) scale(1); } 24% { transform: translateY(0.18rem) rotate(-4deg) scale(0.98); } 100% { opacity: 0; transform: translate(1.8rem, -8.8rem) rotate(18deg) scale(0.72); } }
+@keyframes peck-label-fade { to { opacity: 0; transform: translateY(-1.4rem); } }
+@keyframes peck-spark-one { 0% { opacity: 0; transform: translate(0.8rem, 0.8rem) scale(0.2); } 30% { opacity: 1; } 100% { opacity: 0; transform: translate(2.2rem, -1.2rem) scale(1); } }
+@keyframes peck-spark-two { 0% { opacity: 0; transform: translate(2rem, 1rem) scale(0.2); } 30% { opacity: 0.8; } 100% { opacity: 0; transform: translate(-1.4rem, -1.6rem) scale(0.7); } }
+
+@media (max-width: 720px) {
+  .peck-desktop-stage { inset: 1rem 0.5rem 5.25rem; border-radius: 1.25rem; }
+  .peck-desktop-stage__status { display: none; }
+  .peck-desktop-app { transform: translate(-50%, -50%) scale(0.82); }
+  .peck-desktop-stage__hint { font-size: 0.54rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .woodpecker-stage, .woodpecker-stage * { transition: none !important; animation: none !important; }
+}
+
+.language-switch { display: inline-flex; flex-shrink: 0; padding: 3px; border: 1px solid #d4e0d3; border-radius: 999px; background: #f7faf5; }
+.language-switch button { border: 0; border-radius: 999px; background: transparent; color: #728478; cursor: pointer; font: inherit; font-size: 11px; font-weight: 700; line-height: 1; padding: 7px 9px; }
+.language-switch button[aria-pressed="true"] { background: #315f50; color: #fff; }
+.language-switch button:focus-visible { outline: 2px solid #779b7f; outline-offset: 2px; }
+@media (max-width: 800px) { .site-header { gap: 10px; } .site-header nav { gap: 10px; } .language-switch button { padding: 7px; } }
+@media (max-width: 440px) { .site-header { padding: 0 4%; } .site-header .brand { font-size: 18px; } .site-header .brand img { width: 30px; height: 30px; } .site-header .nav-cta { padding: 9px; } .site-header .nav-cta span { display: none; } }
+@media (max-width: 400px) { .site-header { gap: 6px; } .site-header nav a { font-size: 11px; } .site-header .nav-cta { font-size: 10px; } .site-header .brand { gap: 4px; font-size: 16px; } .site-header .brand img { width: 26px; height: 26px; } }

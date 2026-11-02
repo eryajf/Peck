@@ -1,0 +1,71 @@
+name: Build and deploy website
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'website/**'
+      - 'data/**'
+      - '.github/workflows/website.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: peck-website-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v5
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+      - name: Install dependencies
+        working-directory: website
+        run: npm ci
+      - name: Lint and build
+        working-directory: website
+        run: |
+          npm run lint
+          npm run build
+      - name: Configure SSH
+        env:
+          DEPLOY_HOST: ${{ secrets.WEBSITE_SSH_HOST }}
+          DEPLOY_PORT: ${{ secrets.WEBSITE_SSH_PORT }}
+          DEPLOY_USER: ${{ secrets.WEBSITE_SSH_USER }}
+          DEPLOY_KEY: ${{ secrets.WEBSITE_SSH_KEY }}
+          DEPLOY_PATH: ${{ secrets.WEBSITE_DEPLOY_PATH }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for name in DEPLOY_HOST DEPLOY_USER DEPLOY_KEY DEPLOY_PATH; do
+            if [[ -z "${!name:-}" ]]; then echo "::error::Missing $name secret"; exit 1; fi
+          done
+          DEPLOY_PORT="${DEPLOY_PORT:-22}"
+          [[ "$DEPLOY_HOST" =~ ^[a-zA-Z0-9][a-zA-Z0-9.-]*$ ]] || { echo '::error::Invalid SSH host'; exit 1; }
+          [[ "$DEPLOY_USER" =~ ^[a-zA-Z_][a-zA-Z0-9_-]*$ ]] || { echo '::error::Invalid SSH user'; exit 1; }
+          [[ "$DEPLOY_PORT" =~ ^[0-9]{1,5}$ ]] && (( DEPLOY_PORT > 0 && DEPLOY_PORT <= 65535 )) || { echo '::error::Invalid SSH port'; exit 1; }
+          [[ "$DEPLOY_PATH" =~ ^/([a-zA-Z0-9_-]+/)*[a-zA-Z0-9_-]+$ ]] || { echo '::error::Deploy path must be an absolute path with simple directory names'; exit 1; }
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_KEY" > "$HOME/.ssh/peck_website"
+          chmod 600 "$HOME/.ssh/peck_website"
+          printf 'Host peck-website\n  HostName %s\n  User %s\n  Port %s\n  IdentityFile %s/.ssh/peck_website\n  IdentitiesOnly yes\n  StrictHostKeyChecking accept-new\n' "$DEPLOY_HOST" "$DEPLOY_USER" "$DEPLOY_PORT" "$HOME" >> "$HOME/.ssh/config"
+      - name: Upload and activate release
+        env:
+          DEPLOY_PATH: ${{ secrets.WEBSITE_DEPLOY_PATH }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          release="${DEPLOY_PATH}/releases/${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          ssh peck-website "mkdir -p '$release' && if [ -e '$DEPLOY_PATH/current' ] && [ ! -L '$DEPLOY_PATH/current' ]; then echo 'current must be a symlink, not an existing directory' >&2; exit 1; fi"
+          rsync -az website/dist/ "peck-website:$release/"
+          ssh peck-website "ln -s '$release' '$DEPLOY_PATH/.current-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}' && mv -Tf '$DEPLOY_PATH/.current-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}' '$DEPLOY_PATH/current'"

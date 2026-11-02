@@ -59,6 +59,10 @@ peck://prepare?v=1&project=Example%20App&bundle_id=org.example.app
 
 `project` 用于显示项目上下文，`bundle_id` 和可选的 `release` 只用于匹配本机候选应用。深链接不能传入本地路径、命令、凭据或自动执行权限；用户仍需核对真实路径并点击确认。
 
+## 官网
+
+官网源码位于 [`website/`](website/)，项目目录在构建时读取 [`data/project-links.json`](data/project-links.json)。本地运行和服务器自动部署配置见 [官网说明](website/README.md)。
+
 ## 开发与构建
 
 需要 macOS 14 或更高版本，以及 Go 1.27.3 或更高版本。项目直接使用官方 `github.com/vivaui/viva` 模块：
