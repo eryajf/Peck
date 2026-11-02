@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1700" height="900" viewBox="0 0 1700 900" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="banner-title banner-description">
   <title id="banner-title">Peck — 把受阻的应用交给啄木鸟</title>
-  <desc id="banner-description">奶油桃色画面中，八个编程语言图标围绕红冠啄木鸟排列。啄木鸟交替迈步，在每个目标前快速啄击六次，张嘴把小虫吃掉，头顶亮线停留片刻。图标长出翅膀，沿着与啄木鸟朝向一致的弧形尾迹飞走，啄木鸟转头看向飞行方向并抬起翅膀挥别，再走向下一个目标。每四十八秒巡游一轮，图标离开后补入新语言，画面保持七至八个图标。减少动态效果时显示完整静态画面。</desc>
+  <desc id="banner-description">浅绿与暖白画面中，八个编程语言图标围绕红冠啄木鸟排列。啄木鸟交替迈步，在每个目标前快速啄击六次，张嘴把小虫吃掉，头顶亮线停留片刻。图标长出翅膀，沿着与啄木鸟朝向一致的弧形尾迹飞走，啄木鸟转头看向飞行方向并抬起翅膀挥别，再走向下一个目标。每四十八秒巡游一轮，图标离开后补入新语言，画面保持七至八个图标。减少动态效果时显示完整静态画面。</desc>
   <metadata id="skill-icons-license">Language artwork: skill-icons, supplied with the project.
 
 MIT License
@@ -25,7 +25,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 </metadata>
-  <!-- Design: Peck's warm paper, forest green and coral; custom brand illustration.
+  <!-- Design: Peck's sage paper, forest green and coral; custom brand illustration.
        Eight six-second visits share one 48 s timeline, including both feet and all effects.
        Per visit: walk/turn 0-1.86 s; six small pecks 2.18-3.08 s; open-beak eat 3.08-3.96 s;
        success 3.70-4.82 s; flight 4.08-5.12 s; matching head glance and wing wave 4.78-6 s.
@@ -34,7 +34,7 @@ SOFTWARE.
        CSS-only animation supports SVG image embeds and reduced motion. -->
   <defs>
     <linearGradient id="paper-wash" x1="0" y1="0" x2=".85" y2="1">
-      <stop stop-color="#FFF6E7"/><stop offset="1" stop-color="#F8D7C3"/>
+      <stop stop-color="#EFF6EB"/><stop offset="1" stop-color="#D7E8D9"/>
     </linearGradient>
     <radialGradient id="forest-feathers" cx="30%" cy="24%" r="80%">
       <stop stop-color="#64765B"/><stop offset=".48" stop-color="#3A503C"/><stop offset="1" stop-color="#1D3429"/>
@@ -3682,14 +3682,14 @@ SOFTWARE.
     <text x="145" y="132" class="wordmark" fill="#183F35">Peck</text>
     <path d="M1270 119h38" stroke="#D85D48" stroke-width="4" stroke-linecap="round"/>
     <text x="1600" y="128" text-anchor="end" class="eyebrow" fill="#51685B">轻轻啄一下，还你软件自由</text>
-    <rect x="42" y="190" width="1616" height="595" rx="36" fill="#FFF8EE" fill-opacity=".75" stroke="#FFFDF5" stroke-width="2"/>
+    <rect x="42" y="190" width="1616" height="595" rx="36" fill="#F8FBF5" fill-opacity=".78" stroke="#FFFFFF" stroke-width="2"/>
     <!-- A quiet wandering trail gives the freestanding icons a shared place. -->
-    <path d="M118 646c170-170 272-320 501-274 161 32 214 170 410 132 170-33 227-157 498-64" fill="none" stroke="#DDC8A8" stroke-width="2.5" stroke-dasharray="3 15" stroke-linecap="round" opacity=".42"/>
-    <path d="M119 710c370 30 830 32 1468-10" fill="none" stroke="#EFCAB0" stroke-width="12" stroke-linecap="round" opacity=".2"/>
+    <path d="M118 646c170-170 272-320 501-274 161 32 214 170 410 132 170-33 227-157 498-64" fill="none" stroke="#9CBEA1" stroke-width="2.5" stroke-dasharray="3 15" stroke-linecap="round" opacity=".42"/>
+    <path d="M119 710c370 30 830 32 1468-10" fill="none" stroke="#A5C8AA" stroke-width="12" stroke-linecap="round" opacity=".2"/>
     <use href="#small-sprout" transform="translate(101 670) rotate(-12) scale(1.25)"/>
     <use href="#small-sprout" transform="translate(1575 274) rotate(13) scale(.85)"/>
     <use href="#small-sprout" transform="translate(380 260) rotate(-8) scale(.8)"/>
-    <g fill="#D8BE9D" opacity=".55"><ellipse cx="1570" cy="335" rx="5" ry="2.5"/><ellipse cx="1580" cy="332" rx="2.5" ry="2"/><ellipse cx="305" cy="705" rx="4" ry="2.5"/><ellipse cx="1025" cy="728" rx="4" ry="2"/></g>
+    <g fill="#A8BEA4" opacity=".55"><ellipse cx="1570" cy="335" rx="5" ry="2.5"/><ellipse cx="1580" cy="332" rx="2.5" ry="2"/><ellipse cx="305" cy="705" rx="4" ry="2.5"/><ellipse cx="1025" cy="728" rx="4" ry="2"/></g>
     <!-- Go: the insect stays in scene coordinates while the package departs. -->
     <g id="station-go" transform="translate(1380 300)">
       <g transform="scale(1 1)" aria-hidden="true">
@@ -3705,9 +3705,9 @@ SOFTWARE.
           <g transform="translate(-54 -4) scale(-1 1)"><g class="wing-flap"><use href="#flight-wing"/></g></g>
           <g transform="translate(54 -4)"><g class="wing-flap"><use href="#flight-wing"/></g></g>
         </g>
-        <rect x="-66" y="-66" width="132" height="132" rx="32" fill="#C8A77A" opacity=".26"/>
-        <rect x="-62" y="-62" width="124" height="124" rx="30" fill="#FFFCF5" stroke="#DCCBB3" stroke-width="2.4"/>
-        <rect x="-58" y="-58" width="116" height="116" rx="29" fill="#F6EBDD" opacity=".62"/>
+        <rect x="-66" y="-66" width="132" height="132" rx="32" fill="#8BAF91" opacity=".20"/>
+        <rect x="-62" y="-62" width="124" height="124" rx="30" fill="#FBFDF9" stroke="#C3D9C2" stroke-width="2.4"/>
+        <rect x="-58" y="-58" width="116" height="116" rx="29" fill="#E9F3E6" opacity=".62"/>
         <g class="variant variant-0 go-delay" data-language="Go"><g clip-path="url(#language-square)"><use href="#language-go" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">Go</text></g><g class="variant variant-1 go-delay" data-language="Ruby"><g clip-path="url(#language-square)"><use href="#language-ruby" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">Ruby</text></g><g class="variant variant-2 go-delay" data-language="PowerShell"><g clip-path="url(#language-square)"><use href="#language-powershell" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">PowerShell</text></g><g class="variant variant-3 go-delay" data-language="C++"><g clip-path="url(#language-square)"><use href="#language-cpp" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">C++</text></g><g class="variant variant-4 go-delay" data-language="Lua"><g clip-path="url(#language-square)"><use href="#language-lua" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">Lua</text></g>
         <path d="M-39-30a49 49 0 0 1 53-16" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity=".65"/>
       </g>
@@ -3736,9 +3736,9 @@ SOFTWARE.
           <g transform="translate(-54 -4) scale(-1 1)"><g class="wing-flap"><use href="#flight-wing"/></g></g>
           <g transform="translate(54 -4)"><g class="wing-flap"><use href="#flight-wing"/></g></g>
         </g>
-        <rect x="-66" y="-66" width="132" height="132" rx="32" fill="#C8A77A" opacity=".26"/>
-        <rect x="-62" y="-62" width="124" height="124" rx="30" fill="#FFFCF5" stroke="#DCCBB3" stroke-width="2.4"/>
-        <rect x="-58" y="-58" width="116" height="116" rx="29" fill="#F6EBDD" opacity=".62"/>
+        <rect x="-66" y="-66" width="132" height="132" rx="32" fill="#8BAF91" opacity=".20"/>
+        <rect x="-62" y="-62" width="124" height="124" rx="30" fill="#FBFDF9" stroke="#C3D9C2" stroke-width="2.4"/>
+        <rect x="-58" y="-58" width="116" height="116" rx="29" fill="#E9F3E6" opacity=".62"/>
         <g class="variant variant-0 python-delay" data-language="Python"><g clip-path="url(#language-square)"><use href="#language-python" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">Python</text></g><g class="variant variant-1 python-delay" data-language="Java"><g clip-path="url(#language-square)"><use href="#language-java" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">Java</text></g><g class="variant variant-2 python-delay" data-language="Fortran"><g clip-path="url(#language-square)"><use href="#language-fortran" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">Fortran</text></g><g class="variant variant-3 python-delay" data-language="Elixir"><g clip-path="url(#language-square)"><use href="#language-elixir" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">Elixir</text></g><g class="variant variant-4 python-delay" data-language="Nim"><g clip-path="url(#language-square)"><use href="#language-nim" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">Nim</text></g>
         <path d="M-39-30a49 49 0 0 1 53-16" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity=".65"/>
       </g>
@@ -3767,9 +3767,9 @@ SOFTWARE.
           <g transform="translate(-54 -4) scale(-1 1)"><g class="wing-flap"><use href="#flight-wing"/></g></g>
           <g transform="translate(54 -4)"><g class="wing-flap"><use href="#flight-wing"/></g></g>
         </g>
-        <rect x="-66" y="-66" width="132" height="132" rx="32" fill="#C8A77A" opacity=".26"/>
-        <rect x="-62" y="-62" width="124" height="124" rx="30" fill="#FFFCF5" stroke="#DCCBB3" stroke-width="2.4"/>
-        <rect x="-58" y="-58" width="116" height="116" rx="29" fill="#F6EBDD" opacity=".62"/>
+        <rect x="-66" y="-66" width="132" height="132" rx="32" fill="#8BAF91" opacity=".20"/>
+        <rect x="-62" y="-62" width="124" height="124" rx="30" fill="#FBFDF9" stroke="#C3D9C2" stroke-width="2.4"/>
+        <rect x="-58" y="-58" width="116" height="116" rx="29" fill="#E9F3E6" opacity=".62"/>
         <g class="variant variant-0 javascript-delay" data-language="JavaScript"><g clip-path="url(#language-square)"><use href="#language-javascript" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">JavaScript</text></g><g class="variant variant-1 javascript-delay" data-language="OCaml"><g clip-path="url(#language-square)"><use href="#language-ocaml" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">OCaml</text></g><g class="variant variant-2 javascript-delay" data-language="Zig"><g clip-path="url(#language-square)"><use href="#language-zig" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">Zig</text></g><g class="variant variant-3 javascript-delay" data-language="Kotlin"><g clip-path="url(#language-square)"><use href="#language-kotlin" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">Kotlin</text></g><g class="variant variant-4 javascript-delay" data-language="Bash"><g clip-path="url(#language-square)"><use href="#language-bash" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">Bash</text></g>
         <path d="M-39-30a49 49 0 0 1 53-16" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity=".65"/>
       </g>
@@ -3798,9 +3798,9 @@ SOFTWARE.
           <g transform="translate(-54 -4) scale(-1 1)"><g class="wing-flap"><use href="#flight-wing"/></g></g>
           <g transform="translate(54 -4)"><g class="wing-flap"><use href="#flight-wing"/></g></g>
         </g>
-        <rect x="-66" y="-66" width="132" height="132" rx="32" fill="#C8A77A" opacity=".26"/>
-        <rect x="-62" y="-62" width="124" height="124" rx="30" fill="#FFFCF5" stroke="#DCCBB3" stroke-width="2.4"/>
-        <rect x="-58" y="-58" width="116" height="116" rx="29" fill="#F6EBDD" opacity=".62"/>
+        <rect x="-66" y="-66" width="132" height="132" rx="32" fill="#8BAF91" opacity=".20"/>
+        <rect x="-62" y="-62" width="124" height="124" rx="30" fill="#FBFDF9" stroke="#C3D9C2" stroke-width="2.4"/>
+        <rect x="-58" y="-58" width="116" height="116" rx="29" fill="#E9F3E6" opacity=".62"/>
         <g class="variant variant-0 rust-delay" data-language="Rust"><g clip-path="url(#language-square)"><use href="#language-rust" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">Rust</text></g><g class="variant variant-1 rust-delay" data-language="Scala"><g clip-path="url(#language-square)"><use href="#language-scala" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">Scala</text></g><g class="variant variant-2 rust-delay" data-language="Vala"><g clip-path="url(#language-square)"><use href="#language-vala" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">Vala</text></g><g class="variant variant-3 rust-delay" data-language="C"><g clip-path="url(#language-square)"><use href="#language-c" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">C</text></g><g class="variant variant-4 rust-delay" data-language="Haskell"><g clip-path="url(#language-square)"><use href="#language-haskell" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">Haskell</text></g>
         <path d="M-39-30a49 49 0 0 1 53-16" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity=".65"/>
       </g>
@@ -3829,9 +3829,9 @@ SOFTWARE.
           <g transform="translate(-54 -4) scale(-1 1)"><g class="wing-flap"><use href="#flight-wing"/></g></g>
           <g transform="translate(54 -4)"><g class="wing-flap"><use href="#flight-wing"/></g></g>
         </g>
-        <rect x="-66" y="-66" width="132" height="132" rx="32" fill="#C8A77A" opacity=".26"/>
-        <rect x="-62" y="-62" width="124" height="124" rx="30" fill="#FFFCF5" stroke="#DCCBB3" stroke-width="2.4"/>
-        <rect x="-58" y="-58" width="116" height="116" rx="29" fill="#F6EBDD" opacity=".62"/>
+        <rect x="-66" y="-66" width="132" height="132" rx="32" fill="#8BAF91" opacity=".20"/>
+        <rect x="-62" y="-62" width="124" height="124" rx="30" fill="#FBFDF9" stroke="#C3D9C2" stroke-width="2.4"/>
+        <rect x="-58" y="-58" width="116" height="116" rx="29" fill="#E9F3E6" opacity=".62"/>
         <g class="variant variant-0 typescript-delay" data-language="TypeScript"><g clip-path="url(#language-square)"><use href="#language-typescript" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">TypeScript</text></g><g class="variant variant-1 typescript-delay" data-language="C#"><g clip-path="url(#language-square)"><use href="#language-csharp" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">C#</text></g><g class="variant variant-2 typescript-delay" data-language="Clojure"><g clip-path="url(#language-square)"><use href="#language-clojure" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">Clojure</text></g><g class="variant variant-3 typescript-delay" data-language="Dart"><g clip-path="url(#language-square)"><use href="#language-dart" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">Dart</text></g><g class="variant variant-4 typescript-delay" data-language="R"><g clip-path="url(#language-square)"><use href="#language-r" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">R</text></g>
         <path d="M-39-30a49 49 0 0 1 53-16" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity=".65"/>
       </g>
@@ -3860,9 +3860,9 @@ SOFTWARE.
           <g transform="translate(-54 -4) scale(-1 1)"><g class="wing-flap"><use href="#flight-wing"/></g></g>
           <g transform="translate(54 -4)"><g class="wing-flap"><use href="#flight-wing"/></g></g>
         </g>
-        <rect x="-66" y="-66" width="132" height="132" rx="32" fill="#C8A77A" opacity=".26"/>
-        <rect x="-62" y="-62" width="124" height="124" rx="30" fill="#FFFCF5" stroke="#DCCBB3" stroke-width="2.4"/>
-        <rect x="-58" y="-58" width="116" height="116" rx="29" fill="#F6EBDD" opacity=".62"/>
+        <rect x="-66" y="-66" width="132" height="132" rx="32" fill="#8BAF91" opacity=".20"/>
+        <rect x="-62" y="-62" width="124" height="124" rx="30" fill="#FBFDF9" stroke="#C3D9C2" stroke-width="2.4"/>
+        <rect x="-58" y="-58" width="116" height="116" rx="29" fill="#E9F3E6" opacity=".62"/>
         <g class="variant variant-0 swift-delay" data-language="Swift"><g clip-path="url(#language-square)"><use href="#language-swift" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">Swift</text></g><g class="variant variant-1 swift-delay" data-language="Perl"><g clip-path="url(#language-square)"><use href="#language-perl" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">Perl</text></g><g class="variant variant-2 swift-delay" data-language="Solidity"><g clip-path="url(#language-square)"><use href="#language-solidity" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">Solidity</text></g><g class="variant variant-3 swift-delay" data-language="Julia"><g clip-path="url(#language-square)"><use href="#language-julia" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">Julia</text></g><g class="variant variant-4 swift-delay" data-language="PHP"><g clip-path="url(#language-square)"><use href="#language-php" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">PHP</text></g>
         <path d="M-39-30a49 49 0 0 1 53-16" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity=".65"/>
       </g>
@@ -3890,9 +3890,9 @@ SOFTWARE.
           <g transform="translate(-54 -4) scale(-1 1)"><g class="wing-flap"><use href="#flight-wing"/></g></g>
           <g transform="translate(54 -4)"><g class="wing-flap"><use href="#flight-wing"/></g></g>
         </g>
-        <rect x="-66" y="-66" width="132" height="132" rx="32" fill="#C8A77A" opacity=".26"/>
-        <rect x="-62" y="-62" width="124" height="124" rx="30" fill="#FFFCF5" stroke="#DCCBB3" stroke-width="2.4"/>
-        <rect x="-58" y="-58" width="116" height="116" rx="29" fill="#F6EBDD" opacity=".62"/>
+        <rect x="-66" y="-66" width="132" height="132" rx="32" fill="#8BAF91" opacity=".20"/>
+        <rect x="-62" y="-62" width="124" height="124" rx="30" fill="#FBFDF9" stroke="#C3D9C2" stroke-width="2.4"/>
+        <rect x="-58" y="-58" width="116" height="116" rx="29" fill="#E9F3E6" opacity=".62"/>
         <g class="variant variant-0 cpp-delay" data-language="C++"><g clip-path="url(#language-square)"><use href="#language-cpp" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">C++</text></g>
         <g class="variant variant-1 cpp-delay" data-language="C"><g clip-path="url(#language-square)"><use href="#language-c" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">C</text></g>
         <g class="variant variant-2 cpp-delay" data-language="Bash"><g clip-path="url(#language-square)"><use href="#language-bash" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">Bash</text></g>
@@ -3927,9 +3927,9 @@ SOFTWARE.
           <g transform="translate(-54 -4) scale(-1 1)"><g class="wing-flap"><use href="#flight-wing"/></g></g>
           <g transform="translate(54 -4)"><g class="wing-flap"><use href="#flight-wing"/></g></g>
         </g>
-        <rect x="-66" y="-66" width="132" height="132" rx="32" fill="#C8A77A" opacity=".26"/>
-        <rect x="-62" y="-62" width="124" height="124" rx="30" fill="#FFFCF5" stroke="#DCCBB3" stroke-width="2.4"/>
-        <rect x="-58" y="-58" width="116" height="116" rx="29" fill="#F6EBDD" opacity=".62"/>
+        <rect x="-66" y="-66" width="132" height="132" rx="32" fill="#8BAF91" opacity=".20"/>
+        <rect x="-62" y="-62" width="124" height="124" rx="30" fill="#FBFDF9" stroke="#C3D9C2" stroke-width="2.4"/>
+        <rect x="-58" y="-58" width="116" height="116" rx="29" fill="#E9F3E6" opacity=".62"/>
         <g class="variant variant-0 kotlin-delay" data-language="Kotlin"><g clip-path="url(#language-square)"><use href="#language-kotlin" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">Kotlin</text></g>
         <g class="variant variant-1 kotlin-delay" data-language="Clojure"><g clip-path="url(#language-square)"><use href="#language-clojure" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">Clojure</text></g>
         <g class="variant variant-2 kotlin-delay" data-language="Dart"><g clip-path="url(#language-square)"><use href="#language-dart" x="-55" y="-55" width="110" height="110"/></g><text y="106" class="caption">Dart</text></g>
@@ -4041,8 +4041,8 @@ SOFTWARE.
       </g>
       </g>
     </g>
-    <path d="M96 796h1508" stroke="#C4AB8C" stroke-opacity=".4" stroke-width="1.5"/>
+    <path d="M96 796h1508" stroke="#A4BEA4" stroke-opacity=".4" stroke-width="1.5"/>
     <text x="850" y="827" text-anchor="middle" font-size="34" font-weight="700" fill="#183F35" letter-spacing="-.4">遇到应用已损坏，Peck 一下解你忧。</text>
   </g>
-  <rect x="21.5" y="21.5" width="1657" height="857" rx="42" fill="none" stroke="#BEBAA0" stroke-width="3"/>
+  <rect x="21.5" y="21.5" width="1657" height="857" rx="42" fill="none" stroke="#A8C2A8" stroke-width="3"/>
 </svg>
