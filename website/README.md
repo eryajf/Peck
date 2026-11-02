@@ -26,7 +26,7 @@ npm run dev
 | `WEBSITE_SSH_PORT` | SSH 端口，可不填，默认 `22` |
 | `WEBSITE_SSH_USER` | SSH 登录用户名 |
 | `WEBSITE_SSH_KEY` | 用于部署的私钥全文（含 BEGIN/END 行） |
-| `WEBSITE_DEPLOY_PATH` | 服务器上的绝对部署目录，如 `/var/www/peck`；只允许字母、数字、`_`、`-` 和目录分隔符 |
+| `WEBSITE_DEPLOY_PATH` | 服务器上的绝对部署目录，如 `/var/www/peck`；只允许字母、数字、`.`、`_`、`-` 和目录分隔符，不能包含 `.` 或 `..` 路径段 |
 
 先在服务器上创建部署目录并授予该 SSH 用户写权限，在 `authorized_keys` 中配置对应的公钥。工作流在每次运行时自动接受首次连接的服务器主机公钥，因此首次连接不会验证服务器身份。部署使用 `rsync` 和 Linux 的 `mv -T`，服务器需要安装 rsync。每次构建上传到 `releases/<运行编号>-<尝试次数>`，完成后切换 `current` 符号链接；不会删除旧版本。`current` 不可预先是普通目录。服务器信息配置完成前，自动部署会失败并显示缺少配置。
 
