@@ -4,11 +4,15 @@
 .bird { transform-origin: 180px 430px; animation: peck 2.4s ease-in-out infinite; }
 .tap { opacity: 0; animation: tap 2.4s linear infinite; }
 @keyframes peck {
-  0%, 12%, 34%, 56%, 100% { transform: rotate(0deg); }
-  22%, 44% { transform: rotate(10deg); }
-  27%, 49% { transform: rotate(-3deg); }
+  /* Three quick strikes, followed by a longer pause before the next burst. */
+  0%, 10%, 22%, 31%, 40%, 100% { transform: rotate(0deg); }
+  14%, 25%, 34% { transform: rotate(11deg); }
+  18%, 29%, 38% { transform: rotate(-2deg); }
 }
-@keyframes tap { 0%, 20%, 27%, 42%, 49%, 100% { opacity: 0; } 22%, 44% { opacity: 1; } }
+@keyframes tap {
+  0%, 13%, 17%, 24%, 28%, 33%, 37%, 100% { opacity: 0; }
+  14.5%, 25.5%, 34.5% { opacity: 1; }
+}
 @media (prefers-reduced-motion: reduce) {
   .bird, .tap { animation: none; }
   .bird { transform: translateX(44.5px); }
