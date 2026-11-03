@@ -2,6 +2,7 @@
 /build/
 /dist/
 /tmp/
+/output/
 
 # Go test, coverage, profiling, and log output
 *.test

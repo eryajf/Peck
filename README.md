@@ -80,9 +80,15 @@ make package
 
 项目要求 Go 1.27.3 或更高版本。如果本机设置了 `GOTOOLCHAIN=local`，请先安装对应版本的 Go；否则 Go 无法自动切换到 `go.mod` 声明的工具链。
 
-## 捐赠与支持
+## ☕ 赞助与支持
 
-如果 Peck 对你有帮助，欢迎通过[捐赠支持页面](https://wiki.eryajf.net/reward/)请作者喝杯咖啡。你的反馈、问题报告和使用体验同样有帮助，欢迎在 [GitHub Issues](https://github.com/eryajf/Peck/issues) 中提出。
+如果觉得这个软件很有用，并且想要它继续开发，请通过以下方式支持我：
+
+| Ko-fi *（非中国地区）* | | 微信扫码打赏 *（中国地区）* |
+| --- | --- | --- |
+| [<img src="assets/sponsor-kofi.png" alt="通过 Ko-fi 赞助" height="150">](https://ko-fi.com/eryajf) | 或 | <img src="assets/sponsor-wechat.png" alt="微信打赏二维码" height="150"> |
+
+你的反馈、问题报告和使用体验同样有帮助，欢迎在 [GitHub Issues](https://github.com/eryajf/Peck/issues) 中提出。
 
 ## 许可证
 
