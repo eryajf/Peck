@@ -4,6 +4,8 @@
 
 <h1 align="center">Peck</h1>
 
+<p align="center">中文 | <a href="docs/README.en.md">English</a></p>
+
 <p align="center">一个解决 Mac 未签名软件打开已损坏的小工具，帮你啄掉障碍，让软件重新自由飞翔</p>
 
 <p align="center">
