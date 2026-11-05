@@ -11,9 +11,11 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["name", "description", "description_en", "homepage", "bundle_id", "icon", "status", "status_url"],
+        "required": ["name", "category", "category_en", "description", "description_en", "homepage", "bundle_id", "icon", "status", "status_url"],
         "properties": {
           "name": {"type": "string", "minLength": 1, "maxLength": 128},
+          "category": {"type": "string", "minLength": 1, "maxLength": 64},
+          "category_en": {"type": "string", "minLength": 1, "maxLength": 64},
           "description": {"type": "string", "minLength": 1, "maxLength": 240},
           "description_en": {"type": "string", "minLength": 1, "maxLength": 240},
           "homepage": {"type": "string", "format": "uri", "pattern": "^https://"},
@@ -23,7 +25,12 @@
             "maxLength": 255
           },
           "release": {"type": "string", "minLength": 1, "maxLength": 64},
-          "icon": {"type": "string", "format": "uri", "pattern": "^https://"},
+          "icon": {
+            "oneOf": [
+              {"type": "string", "format": "uri", "pattern": "^https://"},
+              {"type": "string", "pattern": "^/images/[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*\\.[A-Za-z0-9]+$"}
+            ]
+          },
           "status": {"type": "string", "minLength": 1, "maxLength": 512},
           "status_url": {"type": "string", "format": "uri", "pattern": "^https://"}
         }

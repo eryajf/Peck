@@ -6,9 +6,11 @@ export interface DeeplinkEntry {
   description: string
   descriptionEn: string
   category: string
+  categoryEn: string
   deeplink: string
   icon: string
   repository: string
+  bundleId: string
   status: string
   statusUrl: string
 }
@@ -21,10 +23,12 @@ export const deeplinks: DeeplinkEntry[] = registry.projects.map((project) => {
     name: project.name,
     description: project.description,
     descriptionEn: project.description_en,
-    category: 'macOS',
+    category: project.category,
+    categoryEn: project.category_en,
     deeplink: `peck://prepare?${params}`,
     icon: project.icon,
     repository: project.homepage,
+    bundleId: project.bundle_id,
     status: project.status,
     statusUrl: project.status_url,
   }

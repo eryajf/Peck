@@ -1,6 +1,6 @@
 # Peck 官网
 
-官网基于 Vite、React 和 TypeScript，是独立于 Go 应用的静态网站。`/deeplinks` 在构建时读取仓库根目录的 `data/project-links.json`，按项目生成 Peck 准备链接，并展示项目状态和来源。更新数据无需手动修改官网代码；数据格式见 `data/project-links.schema.json`。状态信息应随项目发行情况核验更新，使用者仍需检查实际下载的应用。
+官网基于 Vite、React 和 TypeScript，是独立于 Go 应用的静态网站。`/deeplinks` 在构建时读取仓库根目录的 `data/project-links.json`，按项目生成 Peck 准备链接，并展示项目简介和仓库入口。更新数据无需手动修改官网代码；数据格式见 `data/project-links.schema.json`。数据中的状态信息应随项目发行情况核验更新，使用者仍需检查实际下载的应用。每个项目的 `category` 和 `category_en` 分别填写中英文分类名称；同一分类应使用一致的名称，页面会自动生成分类筛选。
 
 ## 本地运行
 
@@ -16,7 +16,7 @@ npm run dev
 
 ## 自动发布到服务器
 
-推送到 `main` 时，只要 `website/`、`data/` 或 `.github/workflows/website.yml` 发生变化，就自动安装依赖、检查、构建并部署。也可在 Actions 中手动运行 **Build and deploy website**（仅 `main`）。现有 GitHub Pages 链接页工作流独立运行。
+推送到 `main` 时，只要 `website/`、`data/`、`assets/peck-icon-animated.svg` 或 `.github/workflows/website.yml` 发生变化，就自动安装依赖、检查、构建并部署。也可在 Actions 中手动运行 **Build and deploy website**（仅 `main`）。现有 GitHub Pages 链接页工作流独立运行。
 
 在仓库 **Settings → Secrets and variables → Actions** 中配置以下 repository secrets：
 

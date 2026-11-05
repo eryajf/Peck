@@ -6,6 +6,7 @@ on:
     paths:
       - 'website/**'
       - 'data/**'
+      - 'assets/peck-icon-animated.svg'
       - '.github/workflows/website.yml'
   workflow_dispatch:
 

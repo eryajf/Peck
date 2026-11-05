@@ -38,3 +38,16 @@
 
 /* Keep the animated illustration in the same sage and forest palette as the hero. */
 .story-art{background:#e8f2e6;box-shadow:0 18px 45px #315b3b14}.story-caption{background:#dcebdc;color:#456c50}.story-caption i{background:#d46450}
+
+/* Shared typography roles for navigation, content and supporting labels. */
+.site .brand{font-weight:var(--weight-bold)}
+.site :is(.site-header nav a,.site-footer a,.nav-cta,.button,.text-link,.closing-link){font-size:var(--type-small);font-weight:var(--weight-bold)}
+.site :is(.eyebrow,.section-kicker,.step-number,.story-caption,.hero-meta,.hero-bottom,.site-footer p,.art-label){font-size:var(--type-caption);font-weight:var(--weight-semibold)}
+.site :is(.section-heading>p,.story-heading p,.principles-lead,.steps p,.principle-list p,.closing p){font-size:var(--type-body);font-weight:var(--weight-regular)}
+.site .hero-copy>p{font-size:var(--type-lead);font-weight:var(--weight-regular)}
+.site :is(.steps h3,.principle-list h3){font-weight:var(--weight-bold)}
+.site :is(.preview-bar,.preview-heading small,.dropzone>span:not(.mock-button),.mock-button,.preview-note p,.preview-footer){font-size:var(--type-caption)}
+.site :is(.preview-bar,.dropzone strong,.preview-note strong){font-weight:var(--weight-semibold)}
+.site .nav-cta-short{display:none}
+@media(max-width:440px){.site .site-header{gap:8px;padding:0 12px}.site .site-header nav{gap:0}.site .site-header nav a,.site .site-header .nav-cta{font-size:var(--type-caption)}.site .site-header .nav-cta{padding:9px}.site .site-header .nav-cta-full{display:inline;margin:0}.site .site-header .nav-cta-arrow{display:none}.site .hero-copy>p{font-size:var(--type-body)}}
+@media(max-width:350px){.site .site-header{gap:6px}.site .site-header .nav-cta-full{display:none}.site .site-header .nav-cta-short{display:inline;margin:0}}

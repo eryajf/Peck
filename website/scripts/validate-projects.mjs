@@ -3,18 +3,29 @@ import { readFile } from 'node:fs/promises'
 const registry = JSON.parse(await readFile(new URL('../../data/project-links.json', import.meta.url), 'utf8'))
 if (!Array.isArray(registry.projects) || registry.projects.length === 0) throw new Error('projects must be a non-empty array')
 const ids = new Set()
-const required = ['name', 'description', 'description_en', 'homepage', 'bundle_id', 'icon', 'status', 'status_url']
+const required = ['name', 'category', 'category_en', 'description', 'description_en', 'homepage', 'bundle_id', 'icon', 'status', 'status_url']
+const categories = new Map()
 for (const project of registry.projects) {
   for (const field of required) {
     if (typeof project[field] !== 'string' || !project[field].trim()) throw new Error(`Missing ${field} for ${project.name || 'project'}`)
     if (/[\p{Cc}\p{Cf}]/u.test(project[field])) throw new Error(`Invalid character in ${field} for ${project.name}`)
   }
   if ([...project.name].length > 128 || !/^[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*$/.test(project.bundle_id) || project.bundle_id.length > 255) throw new Error(`Invalid project name or bundle ID: ${project.name}`)
+  if ([...project.category].length > 64 || [...project.category_en].length > 64) throw new Error(`Invalid category for ${project.name}`)
+  if (categories.has(project.category) && categories.get(project.category) !== project.category_en) throw new Error(`Inconsistent category translation for ${project.category}`)
+  categories.set(project.category, project.category_en)
   if (ids.has(project.bundle_id.toLowerCase())) throw new Error(`Duplicate bundle ID: ${project.bundle_id}`)
   ids.add(project.bundle_id.toLowerCase())
-  for (const field of ['homepage', 'icon', 'status_url']) {
+  for (const field of ['homepage', 'status_url']) {
     const url = new URL(project[field])
     if (url.protocol !== 'https:' || url.username || url.password) throw new Error(`Invalid ${field} for ${project.name}`)
+  }
+  if (project.icon.startsWith('/images/')) {
+    if (!/^\/images\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*\.[A-Za-z0-9]+$/.test(project.icon)) throw new Error(`Invalid icon for ${project.name}`)
+    await readFile(new URL(`../public${project.icon}`, import.meta.url))
+  } else {
+    const icon = new URL(project.icon)
+    if (icon.protocol !== 'https:' || icon.username || icon.password) throw new Error(`Invalid icon for ${project.name}`)
   }
   const home = new URL(project.homepage)
   if (project.homepage.length > 2048 || (home.port && home.port !== '443') || !/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+$/i.test(home.hostname) || /(?:^|\.)(?:localhost|local|lan|internal|home|home\.arpa)$/i.test(home.hostname) || /^\d+(?:\.\d+){3}$/.test(home.hostname)) throw new Error(`Unsupported homepage for ${project.name}`)

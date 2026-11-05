@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+:root {
+  --type-caption: 12px;
+  --type-small: 13px;
+  --type-body: 15px;
+  --type-lead: 16px;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+}
+
 /* Google Fonts loaded via <link> in index.html */
 
 /* ===== Terminal / Hacker Theme (Homepage + Blog) ===== */
@@ -191,7 +202,7 @@
 }
 
 .language-switch { display: inline-flex; flex-shrink: 0; padding: 3px; border: 1px solid #d4e0d3; border-radius: 999px; background: #f7faf5; }
-.language-switch button { border: 0; border-radius: 999px; background: transparent; color: #728478; cursor: pointer; font: inherit; font-size: 11px; font-weight: 700; line-height: 1; padding: 7px 9px; }
+.language-switch button { border: 0; border-radius: 999px; background: transparent; color: #728478; cursor: pointer; font: inherit; font-size: var(--type-caption); font-weight: var(--weight-bold); line-height: 1; padding: 7px 9px; }
 .language-switch button[aria-pressed="true"] { background: #315f50; color: #fff; }
 .language-switch button:focus-visible { outline: 2px solid #779b7f; outline-offset: 2px; }
 @media (max-width: 800px) { .site-header { gap: 10px; } .site-header nav { gap: 10px; } .language-switch button { padding: 7px; } }
