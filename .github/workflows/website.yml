@@ -67,7 +67,90 @@ jobs:
         run: |
           set -euo pipefail
           DEPLOY_PATH="$DEPLOY_ROOT"
-          release="${DEPLOY_PATH}/releases/${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          ssh peck-website "mkdir -p '$release' && if [ -e '$DEPLOY_PATH/current' ] && [ ! -L '$DEPLOY_PATH/current' ]; then echo 'current must be a symlink, not an existing directory' >&2; exit 1; fi"
-          rsync -az website/dist/ "peck-website:$release/"
-          ssh peck-website "ln -s '$release' '$DEPLOY_PATH/.current-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}' && mv -Tf '$DEPLOY_PATH/.current-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}' '$DEPLOY_PATH/current'"
+          timestamp="$(date -u +%Y%m%d%H%M%S)"
+          release="${DEPLOY_PATH}/releases/${timestamp}"
+          while :; do
+            exists="$(ssh peck-website "if [ -e '$release' ]; then printf yes; else printf no; fi")"
+            if [[ "$exists" == no ]]; then
+              break
+            fi
+            sleep 1
+            timestamp="$(date -u +%Y%m%d%H%M%S)"
+            release="${DEPLOY_PATH}/releases/${timestamp}"
+          done
+          staging="$(ssh peck-website "mkdir -p '$DEPLOY_PATH/releases' && mktemp -d '$DEPLOY_PATH/releases/.staging-XXXXXX'")"
+          cleanup_staging() {
+            ssh peck-website "rm -rf '$staging'" || true
+          }
+          trap cleanup_staging EXIT
+          rsync -az --delete website/dist/ "peck-website:$staging/"
+          ssh peck-website "mv -T '$staging' '$release'"
+          trap - EXIT
+          ssh peck-website "set -eu
+          releases_dir='$DEPLOY_PATH/releases'
+          current='$DEPLOY_PATH/current'
+          release='$release'
+          candidate='$DEPLOY_PATH/.current-${timestamp}'
+          backup='$DEPLOY_PATH/.current-backup-${timestamp}'
+          if [ -e \"\$current\" ] && [ ! -d \"\$current\" ] && [ ! -L \"\$current\" ]; then
+            echo 'current must be a directory, symlink, or absent' >&2
+            exit 1
+          fi
+          for stale_backup in '$DEPLOY_PATH'/.current-backup-*; do
+            [ -e \"\$stale_backup\" ] || [ -L \"\$stale_backup\" ] || continue
+            if [ -e \"\$current\" ] || [ -L \"\$current\" ]; then
+              rm -rf \"\$stale_backup\"
+            else
+              mv \"\$stale_backup\" \"\$current\"
+            fi
+          done
+          rm -rf '$DEPLOY_PATH'/.current-*
+          activated=false
+          if [ -L \"\$current\" ]; then
+            rm -rf \"\$candidate\" \"\$backup\"
+            mkdir -p \"\$candidate\"
+            if ! rsync -a --delete \"\$release/\" \"\$candidate/\"; then
+              rm -rf \"\$candidate\"
+              exit 1
+            fi
+            if ! mv \"\$current\" \"\$backup\"; then
+              rm -rf \"\$candidate\"
+              exit 1
+            fi
+            if ! mv \"\$candidate\" \"\$current\"; then
+              rm -rf \"\$candidate\"
+              if ! mv \"\$backup\" \"\$current\"; then
+                echo 'could not restore current after activation failed' >&2
+              fi
+              exit 1
+            fi
+            rm -rf \"\$backup\"
+            activated=true
+          elif [ ! -e \"\$current\" ]; then
+            mkdir -p \"\$current\"
+          fi
+          if [ \"\$activated\" != true ]; then
+            rsync -a --delete \"\$release/\" \"\$current/\"
+          fi
+          rm -rf \"\$releases_dir\"/.staging-* \"\$releases_dir\"/.versions-*
+          versions_file=\"\$releases_dir/.versions-${timestamp}\"
+          old_versions_file=\"\$releases_dir/.old-versions-${timestamp}\"
+          : > \"\$versions_file\"
+          for path in \"\$releases_dir\"/*; do
+            [ -d \"\$path\" ] || continue
+            name=\"\${path##*/}\"
+            case \"\$name\" in
+              [0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9])
+                printf '%s\\n' \"\$name\" >> \"\$versions_file\"
+                ;;
+              *)
+                rm -rf \"\$path\"
+                ;;
+            esac
+          done
+          sort -r \"\$versions_file\" > \"\$old_versions_file\"
+          tail -n +4 \"\$old_versions_file\" > \"\$old_versions_file.tmp\"
+          while IFS= read -r old; do
+            rm -rf \"\$releases_dir/\$old\"
+          done < \"\$old_versions_file.tmp\"
+          rm -f \"\$versions_file\" \"\$old_versions_file\" \"\$old_versions_file.tmp\""
