@@ -88,7 +88,9 @@ jobs:
           rsync -az --delete website/dist/ "peck-website:$staging/"
           ssh peck-website "mv -T '$staging' '$release'"
           trap - EXIT
-          ssh peck-website "set -eu
+          # Feed the activation script to bash explicitly: the SSH account's
+          # login shell may be zsh, which errors on unmatched glob patterns.
+          printf '%s\n' "set -eu
           releases_dir='$DEPLOY_PATH/releases'
           current='$DEPLOY_PATH/current'
           release='$release'
@@ -155,4 +157,4 @@ jobs:
           while IFS= read -r old; do
             rm -rf \"\$releases_dir/\$old\"
           done < \"\$old_versions_file.tmp\"
-          rm -f \"\$versions_file\" \"\$old_versions_file\" \"\$old_versions_file.tmp\""
+          rm -f \"\$versions_file\" \"\$old_versions_file\" \"\$old_versions_file.tmp\"" | ssh peck-website 'bash -s'
