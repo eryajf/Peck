@@ -7,6 +7,8 @@ on:
       - 'website/**'
       - 'data/**'
       - 'assets/peck-icon-animated.svg'
+      - 'assets/peck-badge-animated.svg'
+      - 'assets/peck-badge-animated-dark.svg'
       - '.github/workflows/website.yml'
   workflow_dispatch:
 

@@ -6,7 +6,11 @@ import { deeplinks, type DeeplinkEntry } from '../data/deeplinks'
 import { LanguageSwitch, useLanguage } from '../i18n'
 import './deeplinks.css'
 
-const iconURL = 'https://peck.eryajf.net/images/peck-icon-animated.svg'
+const badgeURL = 'https://peck.eryajf.net/images/peck-badge-animated.svg'
+const badgeURLDark = 'https://peck.eryajf.net/images/peck-badge-animated-dark.svg'
+const previewBadgeURL = '/images/peck-badge-animated.svg'
+const previewBadgeURLDark = '/images/peck-badge-animated-dark.svg'
+type ReadmeTheme = 'auto' | 'light' | 'dark'
 
 function CopyButton({ value, label }: { value: string; label: string }) {
   const { t } = useLanguage()
@@ -25,11 +29,21 @@ function CopyButton({ value, label }: { value: string; label: string }) {
   return <button type="button" className="directory-copy" onClick={handleCopy} aria-live="polite">{status === 'copied' ? t('已复制', 'Copied') : status === 'error' ? t('复制失败', 'Copy failed') : label}</button>
 }
 
-function readmeSnippet(item: DeeplinkEntry, size: number, label: string) {
-  const landing = `https://peck.eryajf.net/deeplinks?project=${encodeURIComponent(item.id)}#readme-title`
-  return `<a href="${landing}">
-  <img src="${iconURL}" width="${size}" height="${size}" alt=""> ${label}
-</a>`
+function readmeLanding(item: DeeplinkEntry) {
+  return `https://peck.eryajf.net/deeplinks?project=${encodeURIComponent(item.id)}#readme-title`
+}
+
+function ReadmeLink({ item, theme }: { item: DeeplinkEntry; theme: ReadmeTheme }) {
+  const image = theme === 'dark' ? previewBadgeURLDark : previewBadgeURL
+  return <a href={item.deeplink} className="directory-readme-link"><picture>{theme === 'auto' && <source media="(prefers-color-scheme: dark)" srcSet={previewBadgeURLDark} />}<img src={image} width="124" height="24" alt="交给 Peck 处理" /></picture></a>
+}
+
+function readmeSnippet(item: DeeplinkEntry, theme: ReadmeTheme) {
+  const image = theme === 'dark' ? badgeURLDark : badgeURL
+  const content = theme === 'auto'
+    ? `  <picture>\n    <source media="(prefers-color-scheme: dark)" srcset="${badgeURLDark}">\n    <img src="${badgeURL}" width="124" height="24" alt="交给 Peck 处理">\n  </picture>`
+    : `  <img src="${image}" width="124" height="24" alt="交给 Peck 处理">`
+  return `<a href="${readmeLanding(item)}">\n${content}\n</a>`
 }
 
 export default function Deeplinks({ embedded = false }: { embedded?: boolean }) {
@@ -37,7 +51,7 @@ export default function Deeplinks({ embedded = false }: { embedded?: boolean }) 
   const { hash, search } = useLocation()
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('all')
-  const [iconSize, setIconSize] = useState(24)
+  const [readmeTheme, setReadmeTheme] = useState<ReadmeTheme>('auto')
   const [selection, setSelection] = useState<{ search: string; id: string } | null>(null)
   const requested = new URLSearchParams(search).get('project')
   const selectedProject = selection?.search === search ? selection.id : requested === null ? deeplinks[0]?.id ?? '' : deeplinks.find((item) => item.id === requested)?.id ?? ''
@@ -50,7 +64,7 @@ export default function Deeplinks({ embedded = false }: { embedded?: boolean }) 
   const categories = useMemo(() => Array.from(new Map(deeplinks.map((item) => [item.category, item.categoryEn])).entries()), [])
   const filteredLinks = useMemo(() => deeplinks.filter((item) => (category === 'all' || item.category === category) && [item.name, item.description, item.descriptionEn, item.category, item.categoryEn, item.bundleId, item.deeplink].join(' ').toLowerCase().includes(term)), [category, term])
   const selectedEntry = deeplinks.find((item) => item.id === selectedProject)
-  const snippet = selectedEntry ? readmeSnippet(selectedEntry, iconSize, t('交给 Peck 处理', 'Hand it to Peck')) : ''
+  const snippet = selectedEntry ? readmeSnippet(selectedEntry, readmeTheme) : ''
 
   return <div className={`directory ${embedded ? 'directory-embedded' : ''}`}>
     {!embedded && <SEO title={`Deeplinks — ${config.name}`} description={t('打开需要处理的 Mac 应用，或把 Peck 放进你的 README。', 'Open Mac apps that need attention, or bring Peck to your README.')} url={config.siteUrl ? `${config.siteUrl}/deeplinks` : ''} />}
@@ -91,7 +105,7 @@ export default function Deeplinks({ embedded = false }: { embedded?: boolean }) 
 
       <section className="directory-readme" aria-labelledby="readme-title">
         <div className="directory-readme-copy"><span className="directory-kicker">SHARE THE SHORTCUT / 02</span><h2 id="readme-title">{t('把 Peck 放进你的 README。', 'Put Peck in your README.')}</h2><p>{t('已收录项目可以把下面的图标放在 README 里。用户点击后进入项目的 Peck 页面，再点击图标唤起 Peck；HTTPS 中转方便兼容 GitHub 等平台。尚未收录的项目可以先提交到目录。', 'Listed projects can put this icon in their README. It links to the project on Peck’s HTTPS page, where users click again to open Peck. Projects not yet listed can submit an entry first.')}</p><ol className="directory-steps"><li><b>01</b><span>{t('从目录中选择已收录的项目。', 'Choose a project already in the directory.')}</span></li><li><b>02</b><span>{t('把图标链接放进 README。', 'Add the button image to the README.')}</span></li><li><b>03</b><span>{t('用户在 Peck 页面点击图标，并在应用中确认处理。', 'Users click the badge on Peck’s page and confirm in the app.')}</span></li></ol></div>
-        <div className="directory-readme-demo"><div className="directory-demo-label"><span>LIVE EXAMPLE</span><span>README / LINK</span></div><div className="directory-demo-stage">{selectedEntry ? <><a href={selectedEntry.deeplink} className="directory-peck-button"><img src="/images/peck-icon-animated.svg" width={iconSize} height={iconSize} style={{ width: iconSize, height: iconSize }} alt="" /><span>{t('交给 Peck 处理', 'Hand it to Peck')}</span></a><p>{t('请先安装并运行过 Peck，再点击图标打开对应应用的准备界面。', 'Install and run Peck first, then click the icon to open this app’s preparation screen.')}</p></> : <p role="status">{t('未找到链接中的项目，请从下方选择项目或提交新项目。', 'The linked project was not found. Choose a project below or submit a new one.')}</p>}</div><label className="directory-demo-select">{t('选择示例项目', 'Choose an example')}<select value={selectedProject} onChange={(event) => setSelection({ search, id: event.target.value })}>{!selectedEntry && <option value="" disabled>{t('请选择项目', 'Choose a project')}</option>}{deeplinks.map((item) => <option value={item.id} key={item.id}>{item.name}</option>)}</select></label><label className="directory-demo-select directory-size-select">{t('图标尺寸', 'Icon size')}<select value={iconSize} onChange={(event) => setIconSize(Number(event.target.value))}><option value={20}>20 × 20 px</option><option value={24}>24 × 24 px {t('（推荐）', '(recommended)')}</option><option value={32}>32 × 32 px</option></select></label><p className="directory-size-note">{t('也可以在 README 代码中调整 width 和 height。', 'You can also adjust width and height in the README code.')}</p>{selectedEntry && <div className="directory-code-wrap"><code>{snippet}</code><CopyButton value={snippet} label={t('复制 README 代码', 'Copy README code')} /></div>}</div>
+        <div className="directory-readme-demo"><div className="directory-demo-label"><span>LIVE EXAMPLE</span><span>README / LINK</span></div><div className={`directory-demo-stage directory-demo-stage--${readmeTheme}`}>{selectedEntry ? <><ReadmeLink item={selectedEntry} theme={readmeTheme} /><p>{t('请先安装并运行过 Peck，再点击图标打开对应应用的准备界面。', 'Install and run Peck first, then click the icon to open this app’s preparation screen.')}</p></> : <p role="status">{t('未找到链接中的项目，请从下方选择项目或提交新项目。', 'The linked project was not found. Choose a project below or submit a new one.')}</p>}</div><label className="directory-demo-select">{t('选择示例项目', 'Choose an example')}<select value={selectedProject} onChange={(event) => setSelection({ search, id: event.target.value })}>{!selectedEntry && <option value="" disabled>{t('请选择项目', 'Choose a project')}</option>}{deeplinks.map((item) => <option value={item.id} key={item.id}>{item.name}</option>)}</select></label><label className="directory-demo-select directory-theme-select">{t('徽章主题', 'Badge theme')}<select value={readmeTheme} onChange={(event) => setReadmeTheme(event.target.value as ReadmeTheme)}><option value="auto">{t('跟随 GitHub 主题', 'Follow GitHub theme')}</option><option value="light">{t('固定浅色', 'Light')}</option><option value="dark">{t('固定深色', 'Dark')}</option></select></label><p className="directory-theme-note">{t('自动模式会根据 GitHub 的主题切换徽章。', 'Auto mode changes the badge with the GitHub theme.')}</p>{selectedEntry && <div className="directory-code-wrap"><code>{snippet}</code><CopyButton value={snippet} label={t('复制 README 代码', 'Copy README code')} /></div>}</div>
       </section>
 
       <section className="directory-contribute"><div><span className="directory-kicker">BUILD WITH PECK / 03</span><h2>{t('你的项目，也可以成为下一个入口。', 'Your project can be the next entry.')}</h2><p>{t('准备好 Bundle ID、项目主页和一条说明，提交后即可把处理入口交给更多用户。', 'Bring a Bundle ID, a project homepage, and a short note. Then give more users a clear path to the fix.')}</p></div><a href={`${config.social.github}/blob/main/data/project-links.json`} target="_blank" rel="noopener noreferrer">{t('查看数据格式', 'View data format')} <span>↗</span></a></section>

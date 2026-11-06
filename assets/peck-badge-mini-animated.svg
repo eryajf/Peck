@@ -4,16 +4,20 @@
 .bird { transform-origin: 180px 430px; animation: peck 2.4s ease-in-out infinite; }
 .tap { opacity: 0; animation: tap 2.4s linear infinite; }
 @keyframes peck {
-  0%, 12%, 34%, 56%, 100% { transform: rotate(0deg); }
-  22%, 44% { transform: rotate(10deg); }
-  27%, 49% { transform: rotate(-3deg); }
+  /* Three quick strikes, followed by a longer pause before the next burst. */
+  0%, 10%, 22%, 31%, 40%, 100% { transform: rotate(0deg); }
+  14%, 25%, 34% { transform: rotate(11deg); }
+  18%, 29%, 38% { transform: rotate(-2deg); }
 }
-@keyframes tap { 0%, 20%, 27%, 42%, 49%, 100% { opacity: 0; } 22%, 44% { opacity: 1; } }
+@keyframes tap {
+  0%, 11%, 20%, 22%, 31%, 32%, 41%, 100% { opacity: 0; }
+  13%, 18%, 24%, 29%, 34%, 39% { opacity: 1; }
+}
 @media (prefers-reduced-motion: reduce) {
   .bird, .tap { animation: none; }
   .bird { transform: translateX(44.5px); }
 }
 </style>
 <rect x=".5" y=".5" width="107" height="19" rx="5" fill="#FFFCF3" stroke="#A9BBAA"/>
-<svg x="2.5" y="2.5" width="15" height="15" viewBox="90 60 420 420"><g class="bird"><g transform="translate(-39 -20)"><path fill="#183F35" d="M 439 178 L 353 189 C 333 201 324 214 332 233 C 345 257 356 283 349 311 C 339 354 303 378 264 395 C 237 408 211 430 178 448 L 150 459 L 176 374 C 170 343 180 309 201 279 C 219 255 238 238 236 215 C 232 195 231 177 234 164 C 225 155 214 145 208 136 C 244 145 271 129 307 141 C 329 147 344 156 353 164 Z"/><path fill="#D85D48" d="M 353 164 C 334 130 309 113 278 109 C 241 104 206 118 184 92 C 190 116 201 132 221 143 C 241 153 261 137 286 139 C 313 141 336 152 353 164 Z"/><path fill="#F5F0E4" d="M 350 173 C 337 171 328 154 310 153 C 281 151 255 168 252 190 C 249 211 265 228 287 244 C 310 261 319 284 313 308 C 307 336 286 357 265 376 C 251 389 240 400 233 411 C 244 402 255 398 268 392 C 304 375 332 350 340 309 C 346 282 336 258 326 237 C 316 216 326 200 348 188 C 321 191 297 199 281 212 C 274 218 279 226 285 232 C 273 228 264 219 270 210 C 285 194 315 185 350 182 Z"/><g fill="#183F35"><circle cx="319" cy="174" r="6"/></g></g></g><path class="tap" d="M465 180l18-6 M465 204l18 7" fill="none" stroke="#D85D48" stroke-width="12" stroke-linecap="round"/></svg><text x="25" y="14.0" fill="#183F35" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="11" font-weight="600">交给 Peck</text>
+<svg x="2.5" y="2.5" width="15" height="15" viewBox="90 60 420 420"><g class="bird"><g transform="translate(-39 -20)"><path fill="#183F35" d="M 439 178 L 353 189 C 333 201 324 214 332 233 C 345 257 356 283 349 311 C 339 354 303 378 264 395 C 237 408 211 430 178 448 L 150 459 L 176 374 C 170 343 180 309 201 279 C 219 255 238 238 236 215 C 232 195 231 177 234 164 C 225 155 214 145 208 136 C 244 145 271 129 307 141 C 329 147 344 156 353 164 Z"/><path fill="#D85D48" d="M 353 164 C 334 130 309 113 278 109 C 241 104 206 118 184 92 C 190 116 201 132 221 143 C 241 153 261 137 286 139 C 313 141 336 152 353 164 Z"/><path fill="#F5F0E4" d="M 350 173 C 337 171 328 154 310 153 C 281 151 255 168 252 190 C 249 211 265 228 287 244 C 310 261 319 284 313 308 C 307 336 286 357 265 376 C 251 389 240 400 233 411 C 244 402 255 398 268 392 C 304 375 332 350 340 309 C 346 282 336 258 326 237 C 316 216 326 200 348 188 C 321 191 297 199 281 212 C 274 218 279 226 285 232 C 273 228 264 219 270 210 C 285 194 315 185 350 182 Z"/><g fill="#183F35"><circle cx="319" cy="174" r="6"/></g></g></g><path class="tap" d="M448 168l29-17 M455 194h34 M448 220l29 17" fill="none" stroke="#D85D48" stroke-width="12" stroke-linecap="round"/></svg><text x="25" y="14.0" fill="#183F35" font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="11" font-weight="600">交给 Peck 处理</text>
 </svg>
