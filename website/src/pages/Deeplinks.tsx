@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import SEO from '../components/SEO'
 import { config } from '../config'
@@ -30,7 +30,7 @@ function CopyButton({ value, label }: { value: string; label: string }) {
 }
 
 function readmeLanding(item: DeeplinkEntry) {
-  return `https://peck.eryajf.net/deeplinks?project=${encodeURIComponent(item.id)}#readme-title`
+  return `https://peck.eryajf.net/deeplinks?project=${encodeURIComponent(item.id)}&launch=1#readme-title`
 }
 
 function ReadmeLink({ item, theme }: { item: DeeplinkEntry; theme: ReadmeTheme }) {
@@ -53,7 +53,9 @@ export default function Deeplinks({ embedded = false }: { embedded?: boolean }) 
   const [category, setCategory] = useState('all')
   const [readmeTheme, setReadmeTheme] = useState<ReadmeTheme>('auto')
   const [selection, setSelection] = useState<{ search: string; id: string } | null>(null)
+  const launchAttempted = useRef(false)
   const requested = new URLSearchParams(search).get('project')
+  const requestedLaunch = new URLSearchParams(search).get('launch') === '1'
   const selectedProject = selection?.search === search ? selection.id : requested === null ? deeplinks[0]?.id ?? '' : deeplinks.find((item) => item.id === requested)?.id ?? ''
   useEffect(() => {
     if (embedded || hash !== '#readme-title') return
@@ -64,6 +66,15 @@ export default function Deeplinks({ embedded = false }: { embedded?: boolean }) 
   const categories = useMemo(() => Array.from(new Map(deeplinks.map((item) => [item.category, item.categoryEn])).entries()), [])
   const filteredLinks = useMemo(() => deeplinks.filter((item) => (category === 'all' || item.category === category) && [item.name, item.description, item.descriptionEn, item.category, item.categoryEn, item.bundleId, item.deeplink].join(' ').toLowerCase().includes(term)), [category, term])
   const selectedEntry = deeplinks.find((item) => item.id === selectedProject)
+  const launchURL = selectedEntry?.deeplink
+  useEffect(() => {
+    if (embedded || !requestedLaunch || !launchURL || launchAttempted.current) return
+    const frame = requestAnimationFrame(() => {
+      launchAttempted.current = true
+      window.location.assign(launchURL)
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [embedded, launchURL, requestedLaunch])
   const snippet = selectedEntry ? readmeSnippet(selectedEntry, readmeTheme) : ''
 
   return <div className={`directory ${embedded ? 'directory-embedded' : ''}`}>
@@ -104,8 +115,8 @@ export default function Deeplinks({ embedded = false }: { embedded?: boolean }) 
       </section>
 
       <section className="directory-readme" aria-labelledby="readme-title">
-        <div className="directory-readme-copy"><span className="directory-kicker">SHARE THE SHORTCUT / 02</span><h2 id="readme-title">{t('把 Peck 放进你的 README。', 'Put Peck in your README.')}</h2><p>{t('已收录项目可以把下面的图标放在 README 里。用户点击后进入项目的 Peck 页面，再点击图标唤起 Peck；HTTPS 中转方便兼容 GitHub 等平台。尚未收录的项目可以先提交到目录。', 'Listed projects can put this icon in their README. It links to the project on Peck’s HTTPS page, where users click again to open Peck. Projects not yet listed can submit an entry first.')}</p><ol className="directory-steps"><li><b>01</b><span>{t('从目录中选择已收录的项目。', 'Choose a project already in the directory.')}</span></li><li><b>02</b><span>{t('把图标链接放进 README。', 'Add the button image to the README.')}</span></li><li><b>03</b><span>{t('用户在 Peck 页面点击图标，并在应用中确认处理。', 'Users click the badge on Peck’s page and confirm in the app.')}</span></li></ol></div>
-        <div className="directory-readme-demo"><div className="directory-demo-label"><span>LIVE EXAMPLE</span><span>README / LINK</span></div><div className={`directory-demo-stage directory-demo-stage--${readmeTheme}`}>{selectedEntry ? <><ReadmeLink item={selectedEntry} theme={readmeTheme} /><p>{t('请先安装并运行过 Peck，再点击图标打开对应应用的准备界面。', 'Install and run Peck first, then click the icon to open this app’s preparation screen.')}</p></> : <p role="status">{t('未找到链接中的项目，请从下方选择项目或提交新项目。', 'The linked project was not found. Choose a project below or submit a new one.')}</p>}</div><label className="directory-demo-select">{t('选择示例项目', 'Choose an example')}<select value={selectedProject} onChange={(event) => setSelection({ search, id: event.target.value })}>{!selectedEntry && <option value="" disabled>{t('请选择项目', 'Choose a project')}</option>}{deeplinks.map((item) => <option value={item.id} key={item.id}>{item.name}</option>)}</select></label><label className="directory-demo-select directory-theme-select">{t('徽章主题', 'Badge theme')}<select value={readmeTheme} onChange={(event) => setReadmeTheme(event.target.value as ReadmeTheme)}><option value="auto">{t('跟随 GitHub 主题', 'Follow GitHub theme')}</option><option value="light">{t('固定浅色', 'Light')}</option><option value="dark">{t('固定深色', 'Dark')}</option></select></label><p className="directory-theme-note">{t('自动模式会根据 GitHub 的主题切换徽章。', 'Auto mode changes the badge with the GitHub theme.')}</p>{selectedEntry && <div className="directory-code-wrap"><code>{snippet}</code><CopyButton value={snippet} label={t('复制 README 代码', 'Copy README code')} /></div>}</div>
+        <div className="directory-readme-copy"><span className="directory-kicker">SHARE THE SHORTCUT / 02</span><h2 id="readme-title">{t('把 Peck 放进你的 README。', 'Put Peck in your README.')}</h2><p>{t('已收录项目可以把下面的图标放在 README 里。用户点击后进入项目的 Peck 页面，页面会先尝试唤起 Peck；如果浏览器拦截，再点击图标即可。HTTPS 中转方便兼容 GitHub 等平台。尚未收录的项目可以先提交到目录。', 'Listed projects can put this icon in their README. After the HTTPS page opens, it will try to launch Peck; if the browser blocks it, click the badge there. The HTTPS handoff keeps the link compatible with GitHub. Projects not yet listed can submit an entry first.')}</p><ol className="directory-steps"><li><b>01</b><span>{t('从目录中选择已收录的项目。', 'Choose a project already in the directory.')}</span></li><li><b>02</b><span>{t('把图标链接放进 README。', 'Add the button image to the README.')}</span></li><li><b>03</b><span>{t('页面会先尝试唤起 Peck；必要时点击图标，再在应用中确认处理。', 'The page tries to launch Peck first; if needed, click the badge and confirm in the app.')}</span></li></ol></div>
+        <div className="directory-readme-demo"><div className="directory-demo-label"><span>LIVE EXAMPLE</span><span>README / LINK</span></div><div className={`directory-demo-stage directory-demo-stage--${readmeTheme}`}>{selectedEntry ? <><ReadmeLink item={selectedEntry} theme={readmeTheme} /><p>{t('页面会先尝试打开 Peck；如果浏览器拦截，请点击图标打开对应应用的准备界面。', 'The page tries to open Peck first; if the browser blocks it, click the badge to open this app’s preparation screen.')}</p></> : <p role="status">{t('未找到链接中的项目，请从下方选择项目或提交新项目。', 'The linked project was not found. Choose a project below or submit a new one.')}</p>}</div><label className="directory-demo-select">{t('选择示例项目', 'Choose an example')}<select value={selectedProject} onChange={(event) => setSelection({ search, id: event.target.value })}>{!selectedEntry && <option value="" disabled>{t('请选择项目', 'Choose a project')}</option>}{deeplinks.map((item) => <option value={item.id} key={item.id}>{item.name}</option>)}</select></label><label className="directory-demo-select directory-theme-select">{t('徽章主题', 'Badge theme')}<select value={readmeTheme} onChange={(event) => setReadmeTheme(event.target.value as ReadmeTheme)}><option value="auto">{t('跟随 GitHub 主题', 'Follow GitHub theme')}</option><option value="light">{t('固定浅色', 'Light')}</option><option value="dark">{t('固定深色', 'Dark')}</option></select></label><p className="directory-theme-note">{t('自动模式会根据 GitHub 的主题切换徽章。', 'Auto mode changes the badge with the GitHub theme.')}</p>{selectedEntry && <div className="directory-code-wrap"><code>{snippet}</code><CopyButton value={snippet} label={t('复制 README 代码', 'Copy README code')} /></div>}</div>
       </section>
 
       <section className="directory-contribute"><div><span className="directory-kicker">BUILD WITH PECK / 03</span><h2>{t('你的项目，也可以成为下一个入口。', 'Your project can be the next entry.')}</h2><p>{t('准备好 Bundle ID、项目主页和一条说明，提交后即可把处理入口交给更多用户。', 'Bring a Bundle ID, a project homepage, and a short note. Then give more users a clear path to the fix.')}</p></div><a href={`${config.social.github}/blob/main/data/project-links.json`} target="_blank" rel="noopener noreferrer">{t('查看数据格式', 'View data format')} <span>↗</span></a></section>
