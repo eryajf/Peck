@@ -3,7 +3,7 @@
 
 package brand
 
-import "github.com/vivaui/viva/ui"
+import ui "github.com/vivaui/viva/gfx"
 
 // peck-lockup-horizontal-color is a compiled vector icon.
 var PeckLockupHorizontalColor = ui.Icon{

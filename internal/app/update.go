@@ -11,8 +11,8 @@ import (
 	"github.com/eryajf/Peck/internal/update"
 	vapp "github.com/vivaui/viva/app"
 	"github.com/vivaui/viva/components"
+	ui "github.com/vivaui/viva/gfx"
 	"github.com/vivaui/viva/markdown"
-	"github.com/vivaui/viva/ui"
 )
 
 var startUpdateApply = update.StartApply

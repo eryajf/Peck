@@ -8,7 +8,7 @@ import (
 	"github.com/eryajf/Peck/internal/brand"
 	"github.com/eryajf/Peck/internal/core"
 	"github.com/eryajf/Peck/internal/vui"
-	"github.com/vivaui/viva/ui"
+	ui "github.com/vivaui/viva/gfx"
 )
 
 func TestNativeMotionHonorsVisibilityAndReducedMotion(t *testing.T) {

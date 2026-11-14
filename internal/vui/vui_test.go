@@ -3,7 +3,7 @@ package vui
 import (
 	"testing"
 
-	"github.com/vivaui/viva/ui"
+	ui "github.com/vivaui/viva/gfx"
 )
 
 func TestTransformUsesTheRequestedPivot(t *testing.T) {

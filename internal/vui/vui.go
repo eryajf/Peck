@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/vivaui/viva/ui"
+	ui "github.com/vivaui/viva/gfx"
 )
 
 type Color struct{ Red, Green, Blue, A float32 }

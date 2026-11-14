@@ -9,7 +9,7 @@ import (
 	"sync"
 
 	"github.com/eryajf/Peck/internal/vui"
-	ui "github.com/vivaui/viva/ui"
+	ui "github.com/vivaui/viva/gfx"
 )
 
 // The PNGs are the approved exported masters, kept outside the Go source so

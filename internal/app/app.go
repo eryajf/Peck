@@ -23,7 +23,7 @@ import (
 	vapp "github.com/vivaui/viva/app"
 	"github.com/vivaui/viva/app/singleinstance"
 	"github.com/vivaui/viva/components"
-	"github.com/vivaui/viva/ui"
+	ui "github.com/vivaui/viva/gfx"
 )
 
 const panelWidth = 400

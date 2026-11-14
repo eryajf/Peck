@@ -4,14 +4,15 @@ go 1.27.3
 
 require (
 	github.com/ebitengine/purego v0.11.1
-	github.com/vivaui/viva v0.2.2
+	github.com/vivaui/viva v0.6.3
 	golang.org/x/image v0.46.0
-	golang.org/x/sys v0.49.0
+	golang.org/x/sys v0.50.0
 )
 
 require (
+	github.com/Microsoft/go-winio v0.6.4 // indirect
 	github.com/pelletier/go-toml/v2 v2.4.3 // indirect
-	golang.org/x/text v0.43.0 // indirect
+	golang.org/x/text v0.44.0 // indirect
 )
 
 tool github.com/vivaui/viva/cmd/viva

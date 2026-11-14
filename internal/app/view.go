@@ -9,7 +9,7 @@ import (
 	"github.com/eryajf/Peck/internal/brand"
 	"github.com/eryajf/Peck/internal/vui"
 	vapp "github.com/vivaui/viva/app"
-	"github.com/vivaui/viva/ui"
+	ui "github.com/vivaui/viva/gfx"
 )
 
 const appPanelCornerRadius = float32(14)

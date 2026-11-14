@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/eryajf/Peck/internal/vui"
-	"github.com/vivaui/viva/ui"
+	ui "github.com/vivaui/viva/gfx"
 )
 
 func TestNormalizeAppearanceKeepsThemeCompatibility(t *testing.T) {

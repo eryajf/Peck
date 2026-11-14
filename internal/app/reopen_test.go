@@ -6,7 +6,7 @@ import (
 
 	"github.com/eryajf/Peck/internal/core"
 	vapp "github.com/vivaui/viva/app"
-	"github.com/vivaui/viva/ui"
+	ui "github.com/vivaui/viva/gfx"
 )
 
 func TestReopenReturnsToWorkspaceAndPreservesCurrentTask(t *testing.T) {
@@ -113,6 +113,7 @@ func (*reopenTestHost) AddStatusItem(vapp.StatusItemConfig) (vapp.StatusItemCont
 }
 
 func (*reopenTestHost) SetDockBadge(string) {}
+func (*reopenTestHost) SetProgress(float32) {}
 
 func (*reopenTestHost) Quit() {}
 

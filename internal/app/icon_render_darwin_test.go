@@ -15,8 +15,8 @@ import (
 	"github.com/eryajf/Peck/internal/core"
 	"github.com/eryajf/Peck/internal/vui"
 	vapp "github.com/vivaui/viva/app"
+	ui "github.com/vivaui/viva/gfx"
 	"github.com/vivaui/viva/headless"
-	"github.com/vivaui/viva/ui"
 )
 
 func TestAppIconPixelsReachMetal(t *testing.T) {

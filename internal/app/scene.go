@@ -5,7 +5,7 @@ import (
 
 	"github.com/eryajf/Peck/internal/brand"
 	"github.com/eryajf/Peck/internal/vui"
-	"github.com/vivaui/viva/ui"
+	ui "github.com/vivaui/viva/gfx"
 )
 
 // artwork keeps the same native scene and timing as the original version. Viva's

@@ -9,7 +9,7 @@ import (
 	"github.com/eryajf/Peck/internal/i18n"
 	"github.com/eryajf/Peck/internal/update"
 	vapp "github.com/vivaui/viva/app"
-	"github.com/vivaui/viva/ui"
+	ui "github.com/vivaui/viva/gfx"
 )
 
 func TestSettingsShowsAboutAndUpdateControls(t *testing.T) {

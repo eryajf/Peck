@@ -10,7 +10,7 @@ import (
 
 	"github.com/eryajf/Peck/internal/brand"
 	vapp "github.com/vivaui/viva/app"
-	"github.com/vivaui/viva/ui"
+	ui "github.com/vivaui/viva/gfx"
 )
 
 func TestThemePreviewRepaintsBothWindowsAndRollsBack(t *testing.T) {

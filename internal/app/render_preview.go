@@ -20,8 +20,8 @@ import (
 	"github.com/eryajf/Peck/internal/i18n"
 	"github.com/eryajf/Peck/internal/update"
 	vapp "github.com/vivaui/viva/app"
+	ui "github.com/vivaui/viva/gfx"
 	"github.com/vivaui/viva/headless"
-	"github.com/vivaui/viva/ui"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/basicfont"
 	"golang.org/x/image/font/opentype"
@@ -110,42 +110,52 @@ func renderPreview(dir string) error {
 // this path keeps previews useful on CI and machines without a Metal device.
 func rasterizePreview(canvas *ui.Canvas, width, height, scale int) *image.RGBA {
 	picture := image.NewRGBA(image.Rect(0, 0, width*scale, height*scale))
-	// Canvas keeps rectangles, triangles and shadows in separate slices, but
-	// records the cross-slice positions on triangles and shadows. Replay that
-	// ordering here so a background gradient cannot overwrite a later button
-	// or the scene artwork (the portable fallback is used when Metal is absent).
-	// This mirrors Viva's painter ordering without introducing a second renderer.
-	rectangles, triangles, shadows := canvas.Rectangles(), canvas.Triangles(), canvas.Shadows()
-	nextTriangle, nextShadow := 0, 0
-	drawBefore := func(rectangleCount int) {
-		for {
-			triangleDue := nextTriangle < len(triangles) && int(triangles[nextTriangle].RectsBefore) <= rectangleCount
-			shadowDue := nextShadow < len(shadows) && int(shadows[nextShadow].RectsBefore) <= rectangleCount
-			if shadowDue && (!triangleDue || int(shadows[nextShadow].TrianglesBefore) <= nextTriangle) {
-				shadow := shadows[nextShadow]
-				nextShadow++
-				r := shadow.Bounds
-				r.X += shadow.Style.OffsetX - shadow.Style.Blur
-				r.Y += shadow.Style.OffsetY - shadow.Style.Blur
-				r.Width += 2 * shadow.Style.Blur
-				r.Height += 2 * shadow.Style.Blur
-				fillPreviewRect(picture, scaleRect(r, scale), shadow.Color, shadow.Radius*float32(scale))
-				continue
+	// Canvas stores each primitive kind in its own slice. Viva 0.6 records the
+	// global paint order on every primitive, so replay the four lists by Order
+	// instead of relying on the removed cross-slice position fields.
+	rectangles, triangles, shadows, texts := canvas.Rectangles(), canvas.Triangles(), canvas.Shadows(), canvas.Texts()
+	nextRectangle, nextTriangle, nextShadow, nextText := 0, 0, 0, 0
+	for nextRectangle < len(rectangles) || nextTriangle < len(triangles) || nextShadow < len(shadows) || nextText < len(texts) {
+		kind := -1
+		order := ^uint32(0)
+		consider := func(candidate uint32, candidateKind int) {
+			if kind == -1 || candidate < order {
+				kind, order = candidateKind, candidate
 			}
-			if !triangleDue {
-				return
-			}
+		}
+		if nextRectangle < len(rectangles) {
+			consider(rectangles[nextRectangle].Order, 0)
+		}
+		if nextTriangle < len(triangles) {
+			consider(triangles[nextTriangle].Order, 1)
+		}
+		if nextShadow < len(shadows) {
+			consider(shadows[nextShadow].Order, 2)
+		}
+		if nextText < len(texts) {
+			consider(texts[nextText].Order, 3)
+		}
+		switch kind {
+		case 0:
+			rectangle := rectangles[nextRectangle]
+			nextRectangle++
+			fillPreviewRect(picture, scaleRect(rectangle.Bounds, scale), rectangle.Color, rectangle.Radius*float32(scale))
+		case 1:
 			drawPreviewTriangle(picture, triangles[nextTriangle], scale)
 			nextTriangle++
+		case 2:
+			shadow := shadows[nextShadow]
+			nextShadow++
+			r := shadow.Bounds
+			r.X += shadow.Style.OffsetX - shadow.Style.Blur
+			r.Y += shadow.Style.OffsetY - shadow.Style.Blur
+			r.Width += 2 * shadow.Style.Blur
+			r.Height += 2 * shadow.Style.Blur
+			fillPreviewRect(picture, scaleRect(r, scale), shadow.Color, shadow.Radius*float32(scale))
+		case 3:
+			drawPreviewText(picture, texts[nextText], scale)
+			nextText++
 		}
-	}
-	for index, rectangle := range rectangles {
-		drawBefore(index)
-		fillPreviewRect(picture, scaleRect(rectangle.Bounds, scale), rectangle.Color, rectangle.Radius*float32(scale))
-	}
-	drawBefore(len(rectangles))
-	for _, text := range canvas.Texts() {
-		drawPreviewText(picture, text, scale)
 	}
 	return picture
 }
