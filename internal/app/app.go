@@ -228,6 +228,7 @@ func Run(args []string, currentVersion ...string) error {
 		a.host = host
 		host.OnReopen(a.showMain)
 		host.OnOpenURL(a.receiveURL)
+		host.OnOpenFile(a.receiveFile)
 		host.OnQuitRequest(func(allow func()) {
 			a.cancelUpdateWork()
 			if a.busy() || a.opening {
@@ -642,6 +643,10 @@ func (a *application) applyWakes() {
 			a.host.Quit()
 		}
 	}
+}
+
+func (a *application) receiveFile(path string) {
+	a.receive(incoming{path: path})
 }
 
 func (a *application) receiveURL(raw string) {

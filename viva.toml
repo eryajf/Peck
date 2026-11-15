@@ -7,6 +7,11 @@ package = "."
 icon = "internal/brand/assets/runtime/app-icon.png"
 url_schemes = ["peck"]
 
+[[app.file_types]]
+name = "macOS application"
+extensions = ["app"]
+uti = "com.apple.application-bundle"
+
 [mac]
 min_system = "14.0"
 category = "public.app-category.utilities"
