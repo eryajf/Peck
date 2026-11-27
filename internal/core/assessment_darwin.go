@@ -26,8 +26,10 @@ type distributionIssue struct {
 
 // assessDistribution is only reached for a strictly verified ad-hoc signature
 // when spctl reports a bare rejection. Do not infer its reason from that
-// rejection: require the complete system diagnostic to identify only the two
-// known distribution requirements.
+// rejection: require a structured syspolicy_check report that identifies only
+// known distribution gaps (missing notarization, optionally with an explicit
+// ad-hoc warning). Newer macOS releases may omit the ad-hoc warning because
+// the caller already confirmed Signature=adhoc independently.
 func assessDistribution(ctx context.Context, path string) (string, error) {
 	out, err := systemCommand(ctx, "/usr/bin/syspolicy_check", "distribution", "--json", path)
 	if ctx.Err() != nil || errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
@@ -60,7 +62,8 @@ func classifyDistributionAssessment(out []byte, path string, commandErr error) (
 	if err := decoder.Decode(&extra); err != io.EOF {
 		return blocked("系统分发检查包含额外结果，停止处理")
 	}
-	if len(report.Output) != 2 {
+	n := len(report.Output)
+	if n != 1 && n != 2 {
 		return blocked("系统分发检查存在其他或不完整的问题，请联系开发者")
 	}
 	seenAdhoc, seenTicket := false, false
@@ -83,7 +86,13 @@ func classifyDistributionAssessment(out []byte, path string, commandErr error) (
 			return blocked("系统分发检查发现其他问题，停止处理；请联系开发者")
 		}
 	}
-	if !seenAdhoc || !seenTicket {
+	// A missing notarization ticket is required. The explicit ad-hoc warning is
+	// optional: some Sequoia builds only report the ticket gap for verified
+	// local signatures that already passed codesign --verify.
+	if !seenTicket {
+		return blocked("系统分发检查未确认本地签名与公证状态，停止处理")
+	}
+	if n == 2 && !seenAdhoc {
 		return blocked("系统分发检查未确认本地签名与公证状态，停止处理")
 	}
 	return "未通过系统分发评估；本地 ad-hoc 签名有效，缺少公证票据；处理不会提供 Apple 公证或安全认证", nil
