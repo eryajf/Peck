@@ -153,6 +153,9 @@ func TestDistributionAssessmentAllowsOnlyCompleteKnownReport(t *testing.T) {
 	if exit70 == nil || exit1 == nil {
 		t.Fatal("fixture exit statuses were not reported")
 	}
+	// Sequoia 15.8.x often omits the Adhoc Signed App warning and only reports
+	// the notarization gap for a codesign-verified local signature.
+	sequoiaTicketOnly := `{"output":[{"SyspolicyCheckAdvice":"If this application has already been uploaded to the Apple notary service, please make sure to attach the ticket with the ` + "`stapler staple`" + ` command. If not, please upload to the Apple notary service using Xcode or via ` + "`notarytool`" + `. ","SyspolicyCheckAdditionalInformation":"","SyspolicyCheckDocumentationLink":"https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution.","SyspolicyCheckErrorFile":"/Applications/Peck Fixture.app","SyspolicyCheckShortError":"Notary Ticket Missing","SyspolicyCheckLongError":"A Notarization ticket is not stapled to this application.","SyspolicyCheckErrorLevel":"Fatal"}]}`
 	tests := []struct {
 		name, report string
 		commandErr   error
@@ -161,6 +164,8 @@ func TestDistributionAssessmentAllowsOnlyCompleteKnownReport(t *testing.T) {
 		{"complete known distribution issues", known, exit70, true},
 		{"recorded system output", recorded, exit70, true},
 		{"known issues in reverse order", reportJSON([]distributionIssue{issues[1], issues[0]}), exit70, true},
+		{"sequoia ticket-only report", sequoiaTicketOnly, exit70, true},
+		{"ticket-only known issue", reportJSON(issues[1:]), exit70, true},
 		{"success exit with error report is inconsistent", known, nil, false},
 		{"other exit status blocked", known, exit1, false},
 		{"tool unavailable blocked", known, errors.New("no such file or directory"), false},
@@ -170,6 +175,7 @@ func TestDistributionAssessmentAllowsOnlyCompleteKnownReport(t *testing.T) {
 		{"missing output blocked", "{}", exit70, false},
 		{"empty issue array blocked", `{"output":[]}`, exit70, false},
 		{"missing ticket issue blocked", reportJSON(issues[:1]), exit70, false},
+		{"codesign error alone blocked", reportJSON([]distributionIssue{{ShortError: "Codesign Error", Level: "Fatal", File: path}}), exit70, false},
 		{"duplicate issue blocked", reportJSON([]distributionIssue{issues[0], issues[0]}), exit70, false},
 		{"additional problem blocked", reportJSON(append(append([]distributionIssue(nil), issues...), distributionIssue{ShortError: "Malware Detected", Level: "Fatal"})), exit70, false},
 		{"unknown issue blocked", strings.Replace(known, "Notary Ticket Missing", "Unrecognized Policy Failure", 1), exit70, false},
